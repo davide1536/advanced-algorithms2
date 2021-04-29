@@ -14,6 +14,7 @@ import collections
 import matplotlib.pyplot as plt
 import copy
 import time
+import random
 
 
 #per_m = "algoritmi-avanzati-laboratorio2/"
@@ -166,8 +167,10 @@ def crea_grafi(path):
 #algoritmo 2-approssimato
 def approx_tsp_tour(g):
     h = []
-    radice = g.getNodo()
+    radice = random.choice(g.lista_nodi)
+    
     T = prim(g, radice)
+    exit(0)
     h = preOrderVisit(radice)
     return h.append(radice)
 
@@ -178,14 +181,17 @@ parsing(directory)
 
 print("fine parsing")
 
+# for g in lista_grafi:
+#     if g.n_nodi == 14:
+#         for i in g.lista_id_nodi:
+#             print(i, g.getNodo(i).x, g.getNodo(i).y)
+#         for j in g.adj_matrix:
+#             print(j)
 for g in lista_grafi:
-    if g.n_nodi == 14:
-        for i in g.lista_id_nodi:
-            print(i, g.getNodo(i).x, g.getNodo(i).y)
-        for j in g.adj_matrix:
-            print(j)
+    if g.n_nodi == 202:
+        print(len(g.adj_matrix[0][:]))
 
-approx_tsp_tour(lista_grafi[0])
+#approx_tsp_tour(lista_grafi[0])
 
 
 

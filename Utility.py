@@ -26,7 +26,7 @@ def calcEuclDist(nodo1, nodo2):
 
 def prim(g, radice):
     g.totPeso = 0
-    radice.padre = radice.nodo
+    radice.padre = radice.id
     lista_nodi_obj = g.getListaNodi()
     index = 0
     for nodo in lista_nodi_obj:
@@ -39,17 +39,17 @@ def prim(g, radice):
     BuildMinHeap(q)
     while q.heapsize != 0:
         u = HeapExtractMin(q)
-        if u.key == float('inf'):
-            exit()
-        g.totPeso += u.key
-        for arco in g.lista_adiacenza[u.nodo]:      #per ogni arco, in lista di adiacenza di u
-            nodo_adj = g.getNodo(arco.nodo2)        #g.getNodo(arco.nodo2) = (oggetto) nodo adiacente a u
-            if isIn(nodo_adj) == 1 and arco.peso < nodo_adj.key:
-                nodo_adj.padre = u.nodo
-                u.figlio = nodo_adj.nodo
-                index = nodo_adj.heapIndex  #ottengo la sua posizione all'interno dell'heap
-                HeapDecreaseKey(q, index, arco.peso)
+        print("radice", u.id)
+        #g.totPeso += u.key
+        for i,peso_adj in enumerate(g.adj_matrix[u.id][:], 1):      #recupero i pesi dei nodi adiacenti ad u 
+            print("riga", i, peso_adj)
+            if isIn(g.getNodo(i)) == 1 and peso_adj < g.getNodo(i).key:
+                g.getNodo(i).padre = u.id
+                index = g.getNodo(i).heapIndex  #ottengo la sua posizione all'interno dell'heap
+                HeapDecreaseKey(q, index, peso_adj)
     return g
+def getTree(g):
+    pass 
 def preOrderVisit(nodo):
     h = []
     h.append(radice)
