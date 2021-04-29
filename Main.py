@@ -16,8 +16,8 @@ import copy
 import time
 
 
-per_m = "algoritmi-avanzati-laboratorio2/"
-#per_m = ""
+#per_m = "algoritmi-avanzati-laboratorio2/"
+per_m = ""
 directory = per_m+"tsp_dataset/"
 lista_grafi = []
 
@@ -163,6 +163,14 @@ def crea_grafi(path):
     lista_grafi.append(g)
     print("aggiunto grafo con", g.n_nodi, "nodi")
 
+#algoritmo 2-approssimato
+def approx_tsp_tour(g):
+    h = []
+    radice = g.getNodo()
+    T = prim(g, radice)
+    h = preOrderVisit(radice)
+    return h.append(radice)
+
 
 
 ######################## MAIN ########################
@@ -176,6 +184,8 @@ for g in lista_grafi:
             print(i, g.getNodo(i).x, g.getNodo(i).y)
         for j in g.adj_matrix:
             print(j)
+
+approx_tsp_tour(lista_grafi[0])
 
 
 
