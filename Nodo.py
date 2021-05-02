@@ -1,4 +1,3 @@
-import math
 class Nodo:
     def __init__(self):
         self.id = 0     #identificativo del nodo

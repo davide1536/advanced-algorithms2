@@ -1,7 +1,8 @@
 from Grafo import Grafo
 from Nodo import Nodo
 from Arco import Arco
-from Utility import *
+from Utility import convert, calcEuclDist, calcGeoDist, prim, preOrderVisit, getTree
+from NodeSet import NodeSet
 import random
 import os
 import math
@@ -145,8 +146,6 @@ def crea_grafi(path):
                     adj_matrix[i][j] = calcGeoDist(g.getNodo(i), g.getNodo(j))
                 else:
                     adj_matrix[i][j] = calcEuclDist(g.getNodo(i), g.getNodo(j))
-            else:
-                adj_matrix[i][j] = 0
     
 
     g.n_nodi = n_nodi
@@ -177,22 +176,87 @@ def approx_tsp_tour(g):
 
 
 
+#algoritmo esatto Held e Karp
+def hkVisit(g,v,S):
+    new_set_node = []
+    if S == [v]:
+        print(g.diz_pesi[g.getNodeSet(v,S)])
+        return g.diz_pesi[g.getNodeSet(v,S)]
+    elif g.diz_pesi[g.getNodeSet(v,S)] != 0:
+        print(g.diz_pesi[g.getNodeSet(v,S)])
+        return g.diz_pesi[g.getNodeSet(v,S)]
+    else:
+        mindist = math.inf
+        minprec = None
+        new_set_node[:] = S
+        #new_set_node.remove(v)
+        new_set_node.pop(0)     #possibile miglioria
+        for u in new_set_node:
+            dist = hkVisit(g, u, new_set_node)
+            print(dist, g.adj_matrix[u][v])
+            if dist + g.adj_matrix[u][v] < mindist:
+                mindist = dist + g.adj_matrix[u][v]
+                minprec = u
+        g.diz_pesi[g.getNodeSet(v, S)] = mindist
+        g.diz_padri[g.getNodeSet(v, S)] = minprec
+    
+
+
+
+#funzione per chiamare l'algorirmo Held e Karp
+def hkTsp(g):
+    #inizializzo le liste v,S
+    for i in range(2, g.n_nodi+1):
+        set_nodi = []               #lista dei sottoinsiemi
+        for j in range(2, g.n_nodi+1):
+            nodeSet = NodeSet()     #creo il nuovo oggetto v,S
+            set_nodi.append(j)      #aggiorno il sottoinsieme
+            nodeSet.v = i           
+            nodeSet.S[:]= set_nodi  
+            g.id2NodeSet[(i,len(set_nodi))] = nodeSet       #creo un id univoco per oggetto v,S e lo aggiungo al diz degli id
+            
+            if len(set_nodi) == 1:
+                g.diz_pesi[nodeSet] = g.adj_matrix[i][1]
+                g.diz_padri[nodeSet] = 1
+            else:
+                g.diz_pesi[nodeSet] = 0
+                g.diz_padri[nodeSet] = None
+    
+    #vertice 0 (1 nel nostro caso)
+    nodeSet = NodeSet()
+    nodeSet.v = 1        
+    nodeSet.S[:]= g.lista_id_nodi 
+    g.id2NodeSet[(1,len(g.lista_id_nodi))] = nodeSet
+    g.diz_pesi[nodeSet] = 0
+    g.diz_padri[nodeSet] = 1
+        
+    
+    return hkVisit(g, 1, g.lista_id_nodi)
+
+
+
 ######################## MAIN ########################
 parsing(directory)
 
 print("fine parsing")
 
-# for g in lista_grafi:
-#     if g.n_nodi == 14:
-#         for i in g.lista_id_nodi:
-#             print(i, g.getNodo(i).x, g.getNodo(i).y)
-#         for j in g.adj_matrix:
-#             print(j)
-# for g in lista_grafi:
-#     if g.n_nodi == 8:
-#         grafo = g
-# for j in range(len(grafo.adj_matrix)):
-#     print(grafo.adj_matrix[j])
+
+for g in lista_grafi:
+    if g.n_nodi == 14:
+        print("PESO")
+        hkTsp(g)
+        """ for i in g.lista_id_nodi:
+            print(i, g.getNodo(i).x, g.getNodo(i).y)
+        for j in g.adj_matrix:
+            print(j) """
+        
+        #for i in g.diz_padri.keys():
+            #print((i.v, i.S), g.diz_pesi[i])
+
+        #for i in g.id2NodeSet.keys():
+        #    print(i, g.id2NodeSet[i])
+
+
 for grafo in lista_grafi:
     hamiltonCycle = approx_tsp_tour(grafo)
 

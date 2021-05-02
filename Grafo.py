@@ -14,10 +14,11 @@ class Grafo:
         self.lista_id_nodi = []
         self.adj_matrix = {} #matrice di adiacenza nxn 
         self.id2Node = {}
-
-        self.n_archi = 0
-        
         self.totPeso = 0
+        self.diz_pesi = {}      #vettore d[v,S]
+        self.diz_padri = {}     #vettore π[v,S]
+        self.id2NodeSet = {}
+        
     
        
     
@@ -37,6 +38,10 @@ class Grafo:
     #restituisce l'oggetto nodo, dato l'id 
     def getNodo(self, id_nodo):
         return self.id2Node[id_nodo]
+
+    #restituisce l'oggetto nodo, dato l'id (vertice, dimensione_lista)
+    def getNodeSet(self, s, V):
+        return self.id2NodeSet[(s, len(V))]
 
     #restituisce la lista di oggetti nodi di un grafo
     def getListaNodi(self):

@@ -1,8 +1,11 @@
 #from Nodo import *
 #from Grafo import *
 import math
-from heap import *
+from heap import heap, HeapDecreaseKey, HeapExtractMin, BuildMinHeap, isIn
+
 h = []
+
+
 #funzione per convertire le coordinate in radianti
 def convert(x):
     PI = 3.141592
@@ -13,6 +16,7 @@ def convert(x):
     #rad = round(PI * (deg + 5.0 * min/3.0) // 180.0)
     return rad
 
+
 def calcGeoDist(nodo1, nodo2):
     RRR = 6378.388
     q1 = math.cos(nodo1.x - nodo2.x)
@@ -21,9 +25,11 @@ def calcGeoDist(nodo1, nodo2):
     dist = (int) (RRR * math.acos(0.5*((1.0 + q1)*q2 - (1.0 - q1)*q3)) + 1.0)
     return dist
 
+
 def calcEuclDist(nodo1, nodo2):
     dist = round(math.sqrt((nodo1.x - nodo2.x)**2 + (nodo1.y - nodo2.y)**2))
     return dist
+
 
 def prim(g, radice):
     g.totPeso = 0
@@ -49,10 +55,14 @@ def prim(g, radice):
                     HeapDecreaseKey(q, index, peso_adj)
     return g
 
+
+
 def getTree(g):
     for nodo in g.lista_nodi:
         if nodo.padre != None:
             nodo.padre.figlio.append(nodo)
+
+
 
 def preOrderVisit(nodo):
     h.append(nodo)
