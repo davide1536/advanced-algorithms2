@@ -2,6 +2,7 @@
 #from Grafo import *
 import math
 from heap import *
+h = []
 #funzione per convertire le coordinate in radianti
 def convert(x):
     PI = 3.141592
@@ -26,7 +27,7 @@ def calcEuclDist(nodo1, nodo2):
 
 def prim(g, radice):
     g.totPeso = 0
-    radice.padre = radice.id
+    #radice.padre = radice.id
     lista_nodi_obj = g.getListaNodi()
     index = 0
     for nodo in lista_nodi_obj:
@@ -39,23 +40,25 @@ def prim(g, radice):
     BuildMinHeap(q)
     while q.heapsize != 0:
         u = HeapExtractMin(q)
-        print("radice", u.id)
         #g.totPeso += u.key
-        for i,peso_adj in enumerate(g.adj_matrix[u.id][:], 1):      #recupero i pesi dei nodi adiacenti ad u 
-            print("riga", i, peso_adj)
-            if isIn(g.getNodo(i)) == 1 and peso_adj < g.getNodo(i).key:
-                g.getNodo(i).padre = u.id
-                index = g.getNodo(i).heapIndex  #ottengo la sua posizione all'interno dell'heap
-                HeapDecreaseKey(q, index, peso_adj)
+        for i,peso_adj in enumerate(g.adj_matrix[u.id][1:], 1):      #recupero i pesi dei nodi adiacenti ad u 
+            if i != u.id: #qui considero  tutti i vicini del nodo u tranne u stesso
+                if isIn(g.getNodo(i)) == 1 and peso_adj < g.getNodo(i).key:
+                    g.getNodo(i).padre = u
+                    index = g.getNodo(i).heapIndex  #ottengo la sua posizione all'interno dell'heap
+                    HeapDecreaseKey(q, index, peso_adj)
     return g
+
 def getTree(g):
-    pass 
+    for nodo in g.lista_nodi:
+        if nodo.padre != None:
+            nodo.padre.figlio.append(nodo)
+
 def preOrderVisit(nodo):
-    h = []
-    h.append(radice)
-    if nodo.figlio != None:
-        for figlio in nodo.figlio:
-            preOrderVisit(nodo) 
+    h.append(nodo)
+    for figlio in nodo.figlio:
+        preOrderVisit(figlio)
     return h
+         
 
 

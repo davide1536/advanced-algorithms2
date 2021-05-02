@@ -168,11 +168,12 @@ def crea_grafi(path):
 def approx_tsp_tour(g):
     h = []
     radice = random.choice(g.lista_nodi)
-    
-    T = prim(g, radice)
-    exit(0)
+    prim(g, radice)
+    getTree(g)
     h = preOrderVisit(radice)
-    return h.append(radice)
+    h.append(radice)
+    hamiltonCycle = h
+    return hamiltonCycle
 
 
 
@@ -187,11 +188,17 @@ print("fine parsing")
 #             print(i, g.getNodo(i).x, g.getNodo(i).y)
 #         for j in g.adj_matrix:
 #             print(j)
-for g in lista_grafi:
-    if g.n_nodi == 202:
-        print(len(g.adj_matrix[0][:]))
+# for g in lista_grafi:
+#     if g.n_nodi == 8:
+#         grafo = g
+# for j in range(len(grafo.adj_matrix)):
+#     print(grafo.adj_matrix[j])
+for grafo in lista_grafi:
+    hamiltonCycle = approx_tsp_tour(grafo)
 
-#approx_tsp_tour(lista_grafi[0])
+# for nodo in grafo.lista_nodi:
+#     print(nodo.padre)
+#     print(nodo.figlio)
 
 
 

@@ -7,6 +7,8 @@ class Nodo:
         self.in_h = 0
         self.key = 0
         self.heapIndex = 0
+        self.padre = None
         self.figlio = []
+
 
     
