@@ -17,6 +17,7 @@ def convert(x):
     return rad
 
 
+
 def calcGeoDist(nodo1, nodo2):
     RRR = 6378.388
     q1 = math.cos(nodo1.x - nodo2.x)
@@ -26,9 +27,11 @@ def calcGeoDist(nodo1, nodo2):
     return dist
 
 
+
 def calcEuclDist(nodo1, nodo2):
     dist = round(math.sqrt((nodo1.x - nodo2.x)**2 + (nodo1.y - nodo2.y)**2))
     return dist
+
 
 
 def prim(g, radice):

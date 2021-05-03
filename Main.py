@@ -163,6 +163,8 @@ def crea_grafi(path):
     lista_grafi.append(g)
     print("aggiunto grafo con", g.n_nodi, "nodi")
 
+
+
 #algoritmo 2-approssimato
 def approx_tsp_tour(g):
     h = []
@@ -257,8 +259,8 @@ for g in lista_grafi:
         #    print(i, g.id2NodeSet[i])
 
 
-for grafo in lista_grafi:
-    hamiltonCycle = approx_tsp_tour(grafo)
+# for grafo in lista_grafi:
+#     hamiltonCycle = approx_tsp_tour(grafo)
 
 # for nodo in grafo.lista_nodi:
 #     print(nodo.padre)
