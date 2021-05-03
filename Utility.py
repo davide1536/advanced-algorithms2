@@ -12,7 +12,7 @@ def convert(x):
     #deg = round(x)
     deg = int(x)
     min = x - deg
-    rad = round(PI * (deg + 5.0 * min/3.0) // 180.0)
+    rad = PI * (deg + 5.0 * min/3.0) / 180.0
     #rad = round(PI * (deg + 5.0 * min/3.0) // 180.0)
     return rad
 

@@ -18,8 +18,8 @@ import time
 import random
 
 
-#per_m = "algoritmi-avanzati-laboratorio2/"
-per_m = ""
+per_m = "algoritmi-avanzati-laboratorio2/"
+#per_m = ""
 directory = per_m+"tsp_dataset/"
 lista_grafi = []
 
@@ -180,12 +180,14 @@ def approx_tsp_tour(g):
 
 #algoritmo esatto Held e Karp
 def hkVisit(g,v,S):
+    print("COPPIA", v, S)
     new_set_node = []
     if S == [v]:
-        print(g.diz_pesi[g.getNodeSet(v,S)])
-        return g.diz_pesi[g.getNodeSet(v,S)]
-    elif g.diz_pesi[g.getNodeSet(v,S)] != 0:
-        print(g.diz_pesi[g.getNodeSet(v,S)])
+        #print("caso base", v, S, g.diz_pesi[g.getNodeSet(v,S)])
+        #return g.diz_pesi[g.getNodeSet(v,S)]
+        return g.adj_matrix[1][v]
+    elif g.diz_pesi[g.getNodeSet(v,S)] != None:
+        #print("già calcolato", v, S, g.diz_pesi[g.getNodeSet(v,S)])
         return g.diz_pesi[g.getNodeSet(v,S)]
     else:
         mindist = math.inf
@@ -195,12 +197,14 @@ def hkVisit(g,v,S):
         new_set_node.pop(0)     #possibile miglioria
         for u in new_set_node:
             dist = hkVisit(g, u, new_set_node)
-            print(dist, g.adj_matrix[u][v])
+            #print(dist, g.adj_matrix[u][v])
             if dist + g.adj_matrix[u][v] < mindist:
                 mindist = dist + g.adj_matrix[u][v]
                 minprec = u
         g.diz_pesi[g.getNodeSet(v, S)] = mindist
         g.diz_padri[g.getNodeSet(v, S)] = minprec
+        
+        return mindist
     
 
 
@@ -221,15 +225,16 @@ def hkTsp(g):
                 g.diz_pesi[nodeSet] = g.adj_matrix[i][1]
                 g.diz_padri[nodeSet] = 1
             else:
-                g.diz_pesi[nodeSet] = 0
+                g.diz_pesi[nodeSet] = None
                 g.diz_padri[nodeSet] = None
     
-    #vertice 0 (1 nel nostro caso)
+    # aggiungo il vertice 0 (1 nel nostro caso)
     nodeSet = NodeSet()
     nodeSet.v = 1        
     nodeSet.S[:]= g.lista_id_nodi 
     g.id2NodeSet[(1,len(g.lista_id_nodi))] = nodeSet
-    g.diz_pesi[nodeSet] = 0
+
+    g.diz_pesi[nodeSet] = None
     g.diz_padri[nodeSet] = 1
         
     
@@ -245,12 +250,12 @@ print("fine parsing")
 
 for g in lista_grafi:
     if g.n_nodi == 14:
-        print("PESO")
-        hkTsp(g)
-        """ for i in g.lista_id_nodi:
-            print(i, g.getNodo(i).x, g.getNodo(i).y)
+        #for i in g.lista_id_nodi:
+        #    print(i, g.getNodo(i).x, g.getNodo(i).y)
         for j in g.adj_matrix:
-            print(j) """
+            print(j)
+        peso = hkTsp(g)
+        print(peso)
         
         #for i in g.diz_padri.keys():
             #print((i.v, i.S), g.diz_pesi[i])
