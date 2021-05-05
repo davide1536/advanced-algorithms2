@@ -1,7 +1,7 @@
 from Grafo import Grafo
 from Nodo import Nodo
 from Arco import Arco
-from Utility import convert, calcEuclDist, calcGeoDist, prim, preOrderVisit, getTree
+from Utility import convert, calcEuclDist, calcGeoDist, prim, preOrderVisit, getTree, creaSottoinsiemi
 from NodeSet import NodeSet
 import random
 import os
@@ -180,15 +180,13 @@ def approx_tsp_tour(g):
 
 #algoritmo esatto Held e Karp
 def hkVisit(g,v,S):
-    print("COPPIA", v, S)
     new_set_node = []
     if S == [v]:
-        #print("caso base", v, S, g.diz_pesi[g.getNodeSet(v,S)])
-        #return g.diz_pesi[g.getNodeSet(v,S)]
         return g.adj_matrix[1][v]
+    
     elif g.diz_pesi[g.getNodeSet(v,S)] != None:
-        #print("già calcolato", v, S, g.diz_pesi[g.getNodeSet(v,S)])
         return g.diz_pesi[g.getNodeSet(v,S)]
+    
     else:
         mindist = math.inf
         minprec = None
@@ -212,27 +210,16 @@ def hkVisit(g,v,S):
 #funzione per chiamare l'algorirmo Held e Karp
 def hkTsp(g):
     #inizializzo le liste v,S
-    for i in range(2, g.n_nodi+1):
-        set_nodi = []               #lista dei sottoinsiemi
-        for j in range(2, g.n_nodi+1):
-            nodeSet = NodeSet()     #creo il nuovo oggetto v,S
-            set_nodi.append(j)      #aggiorno il sottoinsieme
-            nodeSet.v = i           
-            nodeSet.S[:]= set_nodi  
-            g.id2NodeSet[(i,len(set_nodi))] = nodeSet       #creo un id univoco per oggetto v,S e lo aggiungo al diz degli id
-            
-            if len(set_nodi) == 1:
-                g.diz_pesi[nodeSet] = g.adj_matrix[i][1]
-                g.diz_padri[nodeSet] = 1
-            else:
-                g.diz_pesi[nodeSet] = None
-                g.diz_padri[nodeSet] = None
+    creaSottoinsiemi(g)
     
     # aggiungo il vertice 0 (1 nel nostro caso)
     nodeSet = NodeSet()
     nodeSet.v = 1        
-    nodeSet.S[:]= g.lista_id_nodi 
-    g.id2NodeSet[(1,len(g.lista_id_nodi))] = nodeSet
+    nodeSet.S[:]= g.lista_id_nodi
+    v = [1]
+    v.append(g.lista_id_nodi)
+    id_vS = str(v) 
+    g.id2NodeSet[id_vS] = nodeSet
 
     g.diz_pesi[nodeSet] = None
     g.diz_padri[nodeSet] = 1
@@ -249,13 +236,21 @@ print("fine parsing")
 
 
 for g in lista_grafi:
-    if g.n_nodi == 14:
+    if g.n_nodi == 8:
         #for i in g.lista_id_nodi:
         #    print(i, g.getNodo(i).x, g.getNodo(i).y)
-        for j in g.adj_matrix:
-            print(j)
+        #for j in g.adj_matrix:
+            #print(j)
+        
         peso = hkTsp(g)
         print(peso)
+        
+        #for nodo in g.id2NodeSet.keys():
+            #print("id:",nodo, "nodo:", g.id2NodeSet[nodo].v, "subset:", g.id2NodeSet[nodo].S)
+        #print(len(g.id2NodeSet.keys()))
+
+        # peso = hkTsp(g)
+        #print(peso)
         
         #for i in g.diz_padri.keys():
             #print((i.v, i.S), g.diz_pesi[i])

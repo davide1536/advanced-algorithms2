@@ -39,9 +39,12 @@ class Grafo:
     def getNodo(self, id_nodo):
         return self.id2Node[id_nodo]
 
-    #restituisce l'oggetto nodo, dato l'id (vertice, dimensione_lista)
-    def getNodeSet(self, s, V):
-        return self.id2NodeSet[(s, len(V))]
+    #creo un id basato su v, S (precisamente una stringa [[v], [S]]) 
+    #in modo da poter estrarre i valori dal dizionario id -> peso o id -> padri
+    def getNodeSet(self, v, S):
+        v = [v]
+        v.append(S)
+        return self.id2NodeSet[str(v)]
 
     #restituisce la lista di oggetti nodi di un grafo
     def getListaNodi(self):

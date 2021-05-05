@@ -1,5 +1,6 @@
-#from Nodo import *
-#from Grafo import *
+from Nodo import Nodo
+from Grafo import Grafo
+from NodeSet import NodeSet
 import math
 from heap import heap, HeapDecreaseKey, HeapExtractMin, BuildMinHeap, isIn
 
@@ -31,6 +32,43 @@ def calcGeoDist(nodo1, nodo2):
 def calcEuclDist(nodo1, nodo2):
     dist = round(math.sqrt((nodo1.x - nodo2.x)**2 + (nodo1.y - nodo2.y)**2))
     return dist
+
+
+
+#funzione per inizializzare le coppie v,S
+def creaSottoinsiemi(grafo):
+    x = [i for i in range(2,grafo.n_nodi+1)]
+    s = [0]*(grafo.n_nodi)
+    sub_seq(grafo, grafo.n_nodi-1, 0, [], x, s)
+
+
+
+#crea sequenze
+def sub_seq(grafo, n,i,g,x, s):
+    if(i==n):
+        diz_k = []
+        for el in range(0,n):
+            if(s[el]!=0):
+                g.sort()
+                g.append(x[el])
+                diz_k.append(x[el])
+        for key in diz_k:
+            nodeSet = NodeSet()
+            nodeSet.v = key
+            nodeSet.S = g
+            v = [key]       #creo un id univoco per ogni coppia v,S da inserire nel dizionario id2NodeSet
+            v.append(g)
+            grafo.id2NodeSet[str(v)] = nodeSet
+            if len(g) == 1:
+                grafo.diz_pesi[nodeSet] = grafo.adj_matrix[i][1]
+                grafo.diz_padri[nodeSet] = 1
+            else:
+                grafo.diz_pesi[nodeSet] = None
+                grafo.diz_padri[nodeSet] = None
+        return
+    for num in [0,1]:
+      s[i]=num
+      sub_seq(grafo, n, i+1, [], x, s)
 
 
 
