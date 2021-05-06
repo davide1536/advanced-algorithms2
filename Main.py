@@ -18,12 +18,19 @@ import time
 import random
 
 
-per_m = "algoritmi-avanzati-laboratorio2/"
-#per_m = ""
+#per_m = "algoritmi-avanzati-laboratorio2/"
+per_m = ""
 directory = per_m+"tsp_dataset/"
 lista_grafi = []
 
+def computeWeight(c, g):
+    peso = 0
+    for i,nodo in enumerate(c):
+        if i != (len(c)-1): 
+            nextNode = c[i+1]
+            peso += g.adj_matrix[nodo.id][nextNode.id]
 
+    return peso
 
 def parsing(directory):
     for file in os.listdir(directory):
@@ -168,8 +175,9 @@ def crea_grafi(path):
 #algoritmo 2-approssimato
 def approx_tsp_tour(g):
     h = []
-    radice = random.choice(g.lista_nodi)
-    prim(g, radice)
+    #radice = random.choice(g.lista_nodi)
+    radice = g.lista_nodi[0]
+    prim(g, g.lista_nodi[0])
     getTree(g)
     h = preOrderVisit(radice)
     h.append(radice)
@@ -227,6 +235,57 @@ def hkTsp(g):
     
     return hkVisit(g, 1, g.lista_id_nodi)
 
+def updateCiclo(nodoToExtract, ciclo, noCiclo, position):
+    for nodo in noCiclo:
+        if nodo.id == nodoToExtract.id:
+            noCiclo.remove(nodo)
+
+    ciclo.insert(position, nodo)
+
+def getClosestNode(g, ciclo, noCiclo):
+    minPeso = float('inf')
+    for nodo1 in ciclo:
+        for nodo2 in noCiclo:
+            peso = g.adj_matrix[nodo1.id][nodo2.id]
+            if peso < minPeso:
+                minPeso = peso
+                nodo_k = nodo2
+    return nodo_k
+
+def getPosition(g, k, ciclo, noCiclo):
+    minPeso = float('inf')
+    min_i = g.getNodo(1) #al primo ciclo del while restituisco il valore di default (1) in quanto nel circuito parziale è presente solo il primo elemento
+    for i in ciclo:
+        for j in ciclo:
+            if i.id != j.id:
+                pesoi_k = g.adj_matrix[i.id][k.id]
+                pesok_j = g.adj_matrix[k.id][j.id]
+                pesoi_j = g.adj_matrix[i.id][j.id]
+                peso = pesoi_k + pesok_j - pesoi_j
+                if peso < minPeso:
+                    minPeso = peso
+                    min_i = i
+               
+    return min_i
+
+  
+def closest_insertion(g):
+    #tengo traccia dei nodi nel circuito parziale attraverso queste 2 liste
+    verticiNonCiclo = copy.deepcopy(g.lista_nodi) 
+    circuitoParziale = [] #lista contenente il circuito parziale
+    nodo_k = g.getNodo(1) #indico con nodo_k il nodo da inserire all'interno del circuito parziale
+    updateCiclo(nodo_k, circuitoParziale, verticiNonCiclo,0)
+    while len(verticiNonCiclo) != 0: #finche non ho inserito tutti i vertici
+        nodo_k = getClosestNode(g, circuitoParziale, verticiNonCiclo)
+        node_i = getPosition(g, nodo_k, circuitoParziale, verticiNonCiclo)
+        position = circuitoParziale.index(node_i)
+        updateCiclo(nodo_k, circuitoParziale, verticiNonCiclo, position+1)
+         
+    return circuitoParziale
+    
+
+
+
 
 
 ######################## MAIN ########################
@@ -235,15 +294,15 @@ parsing(directory)
 print("fine parsing")
 
 
-for g in lista_grafi:
-    if g.n_nodi == 8:
+# for g in lista_grafi:
+#     if g.n_nodi == 22:
         #for i in g.lista_id_nodi:
         #    print(i, g.getNodo(i).x, g.getNodo(i).y)
         #for j in g.adj_matrix:
             #print(j)
         
-        peso = hkTsp(g)
-        print(peso)
+        # peso = hkTsp(g)
+        # print(peso)
         
         #for nodo in g.id2NodeSet.keys():
             #print("id:",nodo, "nodo:", g.id2NodeSet[nodo].v, "subset:", g.id2NodeSet[nodo].S)
@@ -259,12 +318,27 @@ for g in lista_grafi:
         #    print(i, g.id2NodeSet[i])
 
 
-# for grafo in lista_grafi:
-#     hamiltonCycle = approx_tsp_tour(grafo)
+for grafo in lista_grafi:
+    if grafo.n_nodi == 8:
+        g = grafo
 
+hamiltonCycle = approx_tsp_tour(g)
+for nodo in hamiltonCycle: 
+    print(nodo.id)
+peso = computeWeight(hamiltonCycle, g)
+print(peso)
+
+for j in g.adj_matrix:
+    print(j)
+
+hamiltonCycle = closest_insertion(g)
+for nodo in hamiltonCycle:
+    print(nodo.id)
 # for nodo in grafo.lista_nodi:
 #     print(nodo.padre)
 #     print(nodo.figlio)
+
+
 
 
 
