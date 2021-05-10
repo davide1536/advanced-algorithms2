@@ -32,6 +32,7 @@ def computeWeight(c, g):
 
     return peso
 
+
 def parsing(directory):
     for file in os.listdir(directory):
             crea_grafi(file)
@@ -128,10 +129,11 @@ def crea_grafi(path):
         nodo = Nodo()
         nodo.id = int(riga[0])
         
-        if edge_weigt_type == "GEO":
+        if "GEO" in edge_weigt_type :
             #conversione 
             nodo.x = convert(float(riga[1]))
-            nodo.y = convert(float(riga[1]))
+            nodo.y = convert(float(riga[2])) 
+            
         else:
             nodo.x = float(riga[1])
             nodo.y = float(riga[2])
@@ -149,7 +151,7 @@ def crea_grafi(path):
     for i in range(1, n_nodi+1):
         for j in range(1, n_nodi+1):
             if i != j:
-                if edge_weigt_type == "GEO":
+                if "GEO" in edge_weigt_type:
                     adj_matrix[i][j] = calcGeoDist(g.getNodo(i), g.getNodo(j))
                 else:
                     adj_matrix[i][j] = calcEuclDist(g.getNodo(i), g.getNodo(j))
@@ -168,7 +170,12 @@ def crea_grafi(path):
     
 
     lista_grafi.append(g)
-    print("aggiunto grafo con", g.n_nodi, "nodi")
+    #print("aggiunto grafo con", g.n_nodi, "nodi")
+
+
+
+
+############################################### 2-APPROSSIMATO ###############################################
 
 
 
@@ -186,6 +193,7 @@ def approx_tsp_tour(g):
     return hamiltonCycle
 
 
+############################################### HELD-KARP ###############################################
 
 #algoritmo esatto Held e Karp
 def hkVisit(g,v,S):
@@ -200,11 +208,9 @@ def hkVisit(g,v,S):
         mindist = math.inf
         minprec = None
         new_set_node[:] = S
-        #new_set_node.remove(v)
-        new_set_node.pop(0)     #possibile miglioria
+        new_set_node.remove(v)
         for u in new_set_node:
             dist = hkVisit(g, u, new_set_node)
-            #print(dist, g.adj_matrix[u][v])
             if dist + g.adj_matrix[u][v] < mindist:
                 mindist = dist + g.adj_matrix[u][v]
                 minprec = u
@@ -237,10 +243,9 @@ def hkTsp(g):
     return hkVisit(g, 1, g.lista_id_nodi)
 
 
+############################################### CLOSEST_INSERTION ###############################################
 
 
-
-#funzione 
 def updateCiclo(nodoToExtract, ciclo, noCiclo, position):
     noCiclo.remove(nodoToExtract)
     ciclo.insert(position, nodoToExtract)
@@ -298,26 +303,84 @@ def closest_insertion(g):
     return circuitoParziale
     
 
+############################################### CLOSEST_INSERTION 2 ###############################################
+
+#fuznione per trovare il vicino più vicino
+def closest_neighbour(g, circuito, no_circuito):
+    min_peso = math.inf
+    closest = None
+    for nodo in circuito:
+        for vicino in range(len(no_circuito)):
+            peso = g.adj_matrix[nodo.id][no_circuito[vicino].id]
+            if peso  < min_peso:
+                min_peso = peso
+                closest = no_circuito[vicino]
+                index = vicino
+    
+    return closest, index
+
+
+
+def insert_closest(g, closest, circuito_parziale):
+    min_dist = math.inf
+    for i in range(len(circuito_parziale)):
+        for j in range(len(circuito_parziale)):
+            if circuito_parziale[i].id != circuito_parziale[j].id:
+                dist =( g.adj_matrix[ circuito_parziale[i].id ][closest.id] + 
+                        g.adj_matrix[ circuito_parziale[j].id ][closest.id] - 
+                        g.adj_matrix[ circuito_parziale[i].id ][ circuito_parziale[j].id ] )
+                if dist < min_dist:
+                    min_dist = dist
+    
+    circuito_parziale.insert(i+1, closest)
+
+        
+
+def closest_insertion2(g):
+    no_circuito = []                    #lista contentente i nodi non ancora inseriti nel circuito
+    no_circuito[:] = g.lista_nodi[1:]   #lista nodi, escluso il primo
+    #print([nodo.id for nodo in no_circuito])
+    
+    circuito_parziale = [g.getNodo(1)]             #circuito parziale inizializzato con il primo nodo
+    
+    while len(no_circuito) != 0:
+        closest, index = closest_neighbour(g, circuito_parziale, no_circuito)
+        #print("vicino più vicino: ", closest.id)
+
+        insert_closest(g, closest, circuito_parziale)
+        no_circuito.pop(index)
+    
+    circuito_parziale.append(g.getNodo(1))
+
+    return circuito_parziale
+    
 
 
 
 
-######################## MAIN ########################
+
+
+
+
+
+
+################################################ MAIN ################################################
+
 parsing(directory)
 
 print("fine parsing")
 
 lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
-# for g in lista_grafi:
-#     if g.n_nodi == 22:
+#for g in lista_grafi:
+#    if g.n_nodi == 14:
         #for i in g.lista_id_nodi:
-        #    print(i, g.getNodo(i).x, g.getNodo(i).y)
+        #   print(i, g.getNodo(i).x, g.getNodo(i).y)
         #for j in g.adj_matrix:
-            #print(j)
+        #    print(j)
         
-        # peso = hkTsp(g)
-        # print(peso)
+        #peso = hkTsp(g)
+        #print(peso)
         
         #for nodo in g.id2NodeSet.keys():
             #print("id:",nodo, "nodo:", g.id2NodeSet[nodo].v, "subset:", g.id2NodeSet[nodo].S)
@@ -347,23 +410,26 @@ sol_ottime = { 8 : 14,
                493 : 35002,
                1000 : 18659688 }
 
-# for g in lista_grafi:
-#     print("grafo con: ", g.n_nodi, "nodi")
+for g in lista_grafi:
+    #if g.n_nodi == 14:
+    print("grafo con: ", g.n_nodi, "nodi")
 
-#     hamiltonCycle1 = approx_tsp_tour(g)
-#     peso1 = computeWeight(hamiltonCycle1, g)
-#     hamiltonCycle2 = closest_insertion(g)
-#     print(peso1)
-#     for i, nodo in enumerate(hamiltonCycle2):
-#         hamiltonCycle2[i] = g.getNodo(nodo)
+    #hamiltonCycle1 = approx_tsp_tour(g)
+    #peso1 = computeWeight(hamiltonCycle1, g)
+    hamiltonCycle2 = closest_insertion2(g)
+    #print([nodo.id for nodo in hamiltonCycle2])
+    #print(peso1)
+    #for i, nodo in enumerate(hamiltonCycle2):
+        #hamiltonCycle2[i] = g.getNodo(nodo)
 
-#     peso2 = computeWeight(hamiltonCycle2, g)
+    peso2 = computeWeight(hamiltonCycle2, g)
 
-#     print("approx_tsp fornisce un' approssimazione di", (peso1)/sol_ottime[g.n_nodi])
-#     print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
+    #print("approx_tsp fornisce un' approssimazione di", (peso1)/sol_ottime[g.n_nodi])
+    print("peso atteso: ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso2)
+    print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
 
     
-for grafo in lista_grafi:
+""" for grafo in lista_grafi:
     if grafo.n_nodi == 22:
         g = grafo
 
@@ -382,7 +448,7 @@ for row in matrix:
 
 with open('matrix.txt', 'w') as filehandle:
     filehandle.writelines("%s\n" % str(row)[1:-1] for row in matrix )
-
+ """
 
 
 
