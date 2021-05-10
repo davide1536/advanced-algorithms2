@@ -87,9 +87,9 @@ def prim(g, radice):
     BuildMinHeap(q)
     while q.heapsize != 0:
         u = HeapExtractMin(q)
-        #g.totPeso += u.key
+        g.totPeso += u.key
         for i,peso_adj in enumerate(g.adj_matrix[u.id][1:], 1):      #recupero i pesi dei nodi adiacenti ad u 
-            if i != u.id: #qui considero  tutti i vicini del nodo u tranne u stesso
+            #if i != u.id: #qui considero  tutti i vicini del nodo u tranne u stesso
                 if isIn(g.getNodo(i)) == 1 and peso_adj < g.getNodo(i).key:
                     g.getNodo(i).padre = u
                     index = g.getNodo(i).heapIndex  #ottengo la sua posizione all'interno dell'heap

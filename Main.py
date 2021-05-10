@@ -175,9 +175,10 @@ def crea_grafi(path):
 #algoritmo 2-approssimato
 def approx_tsp_tour(g):
     h = []
-    #radice = random.choice(g.lista_nodi)
-    radice = g.lista_nodi[0]
-    prim(g, g.lista_nodi[0])
+    radice = random.choice(g.lista_nodi)
+    #radice = g.lista_nodi[0]
+    prim(g, radice)
+    print('peso albero:', g.totPeso)
     getTree(g)
     h = preOrderVisit(radice)
     h.append(radice)
@@ -235,52 +236,65 @@ def hkTsp(g):
     
     return hkVisit(g, 1, g.lista_id_nodi)
 
-def updateCiclo(nodoToExtract, ciclo, noCiclo, position):
-    for nodo in noCiclo:
-        if nodo.id == nodoToExtract.id:
-            noCiclo.remove(nodo)
 
-    ciclo.insert(position, nodo)
+
+
+
+#funzione 
+def updateCiclo(nodoToExtract, ciclo, noCiclo, position):
+    noCiclo.remove(nodoToExtract)
+    ciclo.insert(position, nodoToExtract)
+
 
 def getClosestNode(g, ciclo, noCiclo):
     minPeso = float('inf')
     for nodo1 in ciclo:
         for nodo2 in noCiclo:
-            peso = g.adj_matrix[nodo1.id][nodo2.id]
+            peso = g.adj_matrix[nodo1][nodo2]
             if peso < minPeso:
                 minPeso = peso
                 nodo_k = nodo2
     return nodo_k
 
+
 def getPosition(g, k, ciclo, noCiclo):
     minPeso = float('inf')
-    min_i = g.getNodo(1) #al primo ciclo del while restituisco il valore di default (1) in quanto nel circuito parziale è presente solo il primo elemento
+    min_i = 1 #al primo ciclo del while restituisco il valore di default (1) in quanto nel circuito parziale è presente solo il primo elemento
     for i in ciclo:
         for j in ciclo:
-            if i.id != j.id:
-                pesoi_k = g.adj_matrix[i.id][k.id]
-                pesok_j = g.adj_matrix[k.id][j.id]
-                pesoi_j = g.adj_matrix[i.id][j.id]
+            if i != j:
+                pesoi_k = g.adj_matrix[i][k]
+                pesok_j = g.adj_matrix[k][j]
+                pesoi_j = g.adj_matrix[i][j]
                 peso = pesoi_k + pesok_j - pesoi_j
                 if peso < minPeso:
                     minPeso = peso
                     min_i = i
                
-    return min_i
+    return min_i, minPeso
 
   
 def closest_insertion(g):
     #tengo traccia dei nodi nel circuito parziale attraverso queste 2 liste
-    verticiNonCiclo = copy.deepcopy(g.lista_nodi) 
+    verticiNonCiclo = copy.deepcopy(g.lista_id_nodi) 
     circuitoParziale = [] #lista contenente il circuito parziale
-    nodo_k = g.getNodo(1) #indico con nodo_k il nodo da inserire all'interno del circuito parziale
-    updateCiclo(nodo_k, circuitoParziale, verticiNonCiclo,0)
+    #radice = random.choice(g.lista_nodi)
+
+    nodo_k = 1 #indico con nodo_k il nodo da inserire all'interno del circuito parziale
+    updateCiclo(nodo_k, circuitoParziale, verticiNonCiclo,0)    
     while len(verticiNonCiclo) != 0: #finche non ho inserito tutti i vertici
+        #if len(circuitoParziale) == 2:
+        #    circuitoParziale.append(1)
         nodo_k = getClosestNode(g, circuitoParziale, verticiNonCiclo)
-        node_i = getPosition(g, nodo_k, circuitoParziale, verticiNonCiclo)
+        node_i, min_peso = getPosition(g, nodo_k, circuitoParziale, verticiNonCiclo)
+        g.totPeso += min_peso
+        #print("circuito")
+        #print([nodo for nodo in circuitoParziale])
+        #print("nodo precedente", node_i, "nodo da aggiungere", nodo_k)
         position = circuitoParziale.index(node_i)
         updateCiclo(nodo_k, circuitoParziale, verticiNonCiclo, position+1)
-         
+
+    circuitoParziale.append(1)     
     return circuitoParziale
     
 
@@ -293,6 +307,7 @@ parsing(directory)
 
 print("fine parsing")
 
+lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
 # for g in lista_grafi:
 #     if g.n_nodi == 22:
@@ -317,26 +332,58 @@ print("fine parsing")
         #for i in g.id2NodeSet.keys():
         #    print(i, g.id2NodeSet[i])
 
+sol_ottime = { 8 : 14,
+               14 : 3323, 
+               16 : 6859, 
+               22 : 7013,
+               51 : 426,
+               52 : 7542,
+               100 : 21294,
+               #100 : 21282,
+               150 : 6528,
+               202 : 40160,
+               229 : 134602,
+               442 : 50778,
+               493 : 35002,
+               1000 : 18659688 }
 
+# for g in lista_grafi:
+#     print("grafo con: ", g.n_nodi, "nodi")
+
+#     hamiltonCycle1 = approx_tsp_tour(g)
+#     peso1 = computeWeight(hamiltonCycle1, g)
+#     hamiltonCycle2 = closest_insertion(g)
+#     print(peso1)
+#     for i, nodo in enumerate(hamiltonCycle2):
+#         hamiltonCycle2[i] = g.getNodo(nodo)
+
+#     peso2 = computeWeight(hamiltonCycle2, g)
+
+#     print("approx_tsp fornisce un' approssimazione di", (peso1)/sol_ottime[g.n_nodi])
+#     print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
+
+    
 for grafo in lista_grafi:
-    if grafo.n_nodi == 8:
+    if grafo.n_nodi == 22:
         g = grafo
 
+for row in g.adj_matrix:
+    print(row)
+
 hamiltonCycle = approx_tsp_tour(g)
-for nodo in hamiltonCycle: 
-    print(nodo.id)
-peso = computeWeight(hamiltonCycle, g)
-print(peso)
 
-for j in g.adj_matrix:
-    print(j)
+#questa parte serve per scrivere su un file la matrice di adiacenza di un grafo
+matrix = g.adj_matrix
+matrix.pop(0)
 
-hamiltonCycle = closest_insertion(g)
-for nodo in hamiltonCycle:
-    print(nodo.id)
-# for nodo in grafo.lista_nodi:
-#     print(nodo.padre)
-#     print(nodo.figlio)
+for row in matrix:
+    del row[0]
+
+
+with open('matrix.txt', 'w') as filehandle:
+    filehandle.writelines("%s\n" % str(row)[1:-1] for row in matrix )
+
+
 
 
 
