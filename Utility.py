@@ -24,7 +24,7 @@ def calcGeoDist(nodo1, nodo2):
     q1 = math.cos(nodo1.y - nodo2.y)
     q2 = math.cos(nodo1.x - nodo2.x)
     q3 = math.cos(nodo1.x + nodo2.x)
-    dist = (int) (RRR * math.acos(0.5*((1.0 + q1)*q2 - (1.0 - q1)*q3)) + 1.0)
+    dist = (RRR * math.acos(0.5*((1.0 + q1)*q2 - (1.0 - q1)*q3)) + 1.0)
     return dist
 
 

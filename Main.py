@@ -323,49 +323,79 @@ def closest_insertion(g):
 ############################################### CLOSEST_INSERTION 2 ###############################################
 
 #fuznione per trovare il vicino più vicino
-def closest_neighbour(g, circuito, no_circuito):
+def closest_neighbour2(g, circuito, no_circuito):
     min_peso = math.inf
     closest = None
     for nodo in circuito:
         for vicino in range(len(no_circuito)):
             peso = g.adj_matrix[nodo.id][no_circuito[vicino].id]
-            if peso  < min_peso:
+            if peso < min_peso:
                 min_peso = peso
-                closest = no_circuito[vicino]
+                closest = copy.deepcopy(no_circuito[vicino])
                 index = vicino
     
     return closest, index
+
+
+#versione rivista di closest_neighbour, da controllare meglio
+def closest_neighbour(g, circuito, no_circuito):
+    min_peso = [None, math.inf, 0]
+    k = None    
+    
+    for vicino in range(len(no_circuito)):
+        min_k = math.inf        #dato un k, non ancora inserito nel circuito, il suo peso è il minimo tra i pesi calcolati con ogni nodo del circuito
+        for nodo in circuito:
+            peso = g.adj_matrix[nodo.id][no_circuito[vicino].id]
+            if peso < min_k:
+                min_k = peso
+                k = no_circuito[vicino]
+                index = vicino
+
+        if min_k < min_peso[1]:
+            min_peso[1] = min_k
+            min_peso[0] = k
+            min_peso[2] = index
+    
+    return min_peso[0], min_peso[2]
 
 
 
 def insert_closest(g, closest, circuito_parziale):
     min_dist = math.inf
     for i in range(len(circuito_parziale)):
-        for j in range(len(circuito_parziale)):
-            if circuito_parziale[i].id != circuito_parziale[j].id:
-                dist = ( g.adj_matrix[ circuito_parziale[i].id ][closest.id] + 
-                         g.adj_matrix[closest.id][ circuito_parziale[j].id ] - 
-                         g.adj_matrix[ circuito_parziale[i].id ][ circuito_parziale[j].id ] )
-                if dist < min_dist:
-                    min_dist = dist
-    
+        if i < len(circuito_parziale)-1:
+            dist = ( g.adj_matrix[ circuito_parziale[i].id ][closest.id] + 
+                     g.adj_matrix[closest.id][ circuito_parziale[i+1].id ] - 
+                     g.adj_matrix[ circuito_parziale[i].id ][ circuito_parziale[i+1].id ] )
+            if dist < min_dist:
+                min_dist = dist
+        else:
+            dist2 = ( g.adj_matrix[ circuito_parziale[i].id ][closest.id] + 
+                      g.adj_matrix[closest.id][ circuito_parziale[0].id ] - 
+                      g.adj_matrix[ circuito_parziale[i].id ][ circuito_parziale[0].id ] )
+            if dist2 < min_dist:
+                circuito_parziale.append(closest)
+                return
+        
     circuito_parziale.insert(i+1, closest)
 
-        
+
+def remove_closest(index, no_circuito):
+    no_circuito[index] = no_circuito[-1]
+    no_circuito.pop()
+
 
 def closest_insertion2(g):
     no_circuito = []                    #lista contentente i nodi non ancora inseriti nel circuito
     no_circuito[:] = g.lista_nodi[1:]   #lista nodi, escluso il primo
-    #print([nodo.id for nodo in no_circuito])
     
     circuito_parziale = [g.getNodo(1)]             #circuito parziale inizializzato con il primo nodo
     
     while len(no_circuito) != 0:
         closest, index = closest_neighbour(g, circuito_parziale, no_circuito)
-        #print("vicino più vicino: ", closest.id)
 
         insert_closest(g, closest, circuito_parziale)
-        no_circuito.pop(index)
+        remove_closest(index, no_circuito)
     
     circuito_parziale.append(g.getNodo(1))
 
@@ -429,26 +459,30 @@ sol_ottime = { 8 : 14,
 
 
 for g in lista_grafi:
-    print("grafo con: ", g.n_nodi, "nodi")
+    if g.n_nodi == 8:
+        print("grafo con: ", g.n_nodi, "nodi")
 
-    hamiltonCycle1 = approx_tsp_tour(g)
-    peso1 = computeWeight(hamiltonCycle1, g)
+    #hamiltonCycle1 = approx_tsp_tour(g)
+    #peso1 = computeWeight(hamiltonCycle1, g)
     
-    hamiltonCycle2 = closest_insertion2(g)
-    # print([nodo.id for nodo in hamiltonCycle2])
+        hamiltonCycle2 = closest_insertion2(g)
+        circ = [nodo.id for nodo in hamiltonCycle2]
+        print(circ)
+        print(len(circ))
     # print(peso1)
-    for i, nodo in enumerate(hamiltonCycle2):
-        hamiltonCycle2[i] = g.getNodo(nodo.id)
-
-    peso2 = computeWeight(hamiltonCycle2, g)
     
-    print("*"*40) 
-    print("peso atteso (approx_tsp): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso1)
-    print("approx_tsp fornisce un' approssimazione di", (peso1)/sol_ottime[g.n_nodi])
-    print("peso atteso (closest): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso2)
-    print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
-    print()
-    print("*"*40)
+
+        peso2 = computeWeight(hamiltonCycle2, g)
+        print(peso2)
+    
+    #print("*"*40) 
+    #print("peso atteso (approx_tsp): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso1)
+    #print("approx_tsp fornisce un' approssimazione di", (peso1)/sol_ottime[g.n_nodi])
+    
+    #print("peso atteso (closest): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso2)
+        print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
+    #print()
+    #print("*"*40)
 
 # for grafo in lista_grafi:
 #     if grafo.n_nodi == 16:
@@ -464,15 +498,15 @@ for g in lista_grafi:
 # peso = computeWeight(hamiltonCycle, g)
 # print ("peso:", peso)
 # #questa parte serve per scrivere su un file la matrice di adiacenza di un grafo
-# matrix = g.adj_matrix
-# matrix.pop(0)
+        # matrix = g.adj_matrix
+        # matrix.pop(0)
 
-# for row in matrix:
-#     del row[0]
+        # for row in matrix:
+        #     del row[0]
 
 
-# with open('matrix.txt', 'w') as filehandle:
-#     filehandle.writelines("%s\n" % str(row)[1:-1] for row in matrix )
+        # with open('matrix.txt', 'w') as filehandle:
+        #     filehandle.writelines("%s\n" % str(row)[1:-1] for row in matrix )
 
 
 
