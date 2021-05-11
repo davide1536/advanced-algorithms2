@@ -13,7 +13,7 @@ def convert(x):
     #deg = round(x)
     deg = int(x)
     min = x - deg
-    rad = PI * (deg + 5 * min/3) / 180
+    rad = PI * (deg + 5.0 * min/3.0) / 180.0
     #rad = round(PI * (deg + 5.0 * min/3.0) // 180.0)
     return rad
 
@@ -108,6 +108,7 @@ def getTree(g):
 
 def preOrderVisit(nodo):
     h.append(nodo)
+    #print("pre order visit ", nodo.id)
     for figlio in nodo.figlio:
         preOrderVisit(figlio)
     return h
