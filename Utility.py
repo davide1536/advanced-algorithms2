@@ -4,7 +4,7 @@ from NodeSet import NodeSet
 import math
 from heap import heap, HeapDecreaseKey, HeapExtractMin, BuildMinHeap, isIn
 
-h = []
+#h = []
 
 
 #funzione per convertire le coordinate in radianti
@@ -106,11 +106,11 @@ def getTree(g):
 
 
 
-def preOrderVisit(nodo):
+def preOrderVisit(nodo, h):
     h.append(nodo)
     #print("pre order visit ", nodo.id)
     for figlio in nodo.figlio:
-        preOrderVisit(figlio)
+        preOrderVisit(figlio, h)
     return h
          
 

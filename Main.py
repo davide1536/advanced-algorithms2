@@ -204,7 +204,7 @@ def approx_tsp_tour(g):
 
    
 
-    h = preOrderVisit(radice)
+    h = preOrderVisit(radice, h)
     h.append(radice)
     hamiltonCycle = h
     return hamiltonCycle
@@ -429,28 +429,27 @@ sol_ottime = { 8 : 14,
 
 
 for g in lista_grafi:
-    #if g.n_nodi == 14:
     print("grafo con: ", g.n_nodi, "nodi")
 
     hamiltonCycle1 = approx_tsp_tour(g)
     peso1 = computeWeight(hamiltonCycle1, g)
     
-    #hamiltonCycle2 = closest_insertion2(g)
-     #print([nodo.id for nodo in hamiltonCycle2])
-     #print(peso1)
-     #for i, nodo in enumerate(hamiltonCycle2):
-         #hamiltonCycle2[i] = g.getNodo(nodo)
+    hamiltonCycle2 = closest_insertion2(g)
+    # print([nodo.id for nodo in hamiltonCycle2])
+    # print(peso1)
+    for i, nodo in enumerate(hamiltonCycle2):
+        hamiltonCycle2[i] = g.getNodo(nodo.id)
 
-    #peso2 = computeWeight(hamiltonCycle2, g)
+    peso2 = computeWeight(hamiltonCycle2, g)
     
     print("*"*40) 
     print("peso atteso (approx_tsp): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso1)
     print("approx_tsp fornisce un' approssimazione di", (peso1)/sol_ottime[g.n_nodi])
-    # print("peso atteso (closest): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso2)
-    # print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
+    print("peso atteso (closest): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso2)
+    print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
     print()
     print("*"*40)
-    
+
 # for grafo in lista_grafi:
 #     if grafo.n_nodi == 16:
 #         g = grafo
@@ -463,6 +462,7 @@ for g in lista_grafi:
 # for nodo in hamiltonCycle:
 #     print(nodo.id)
 # peso = computeWeight(hamiltonCycle, g)
+# print ("peso:", peso)
 # #questa parte serve per scrivere su un file la matrice di adiacenza di un grafo
 # matrix = g.adj_matrix
 # matrix.pop(0)
