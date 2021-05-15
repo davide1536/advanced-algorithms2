@@ -1,0 +1,75 @@
+\documentclass[a4paper, titlepage]{article}
+\usepackage[table]{xcolor}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{floatflt}
+\usepackage{epsfig}
+\usepackage{pstricks}
+\usepackage{subfigure}
+\usepackage[labelfont=bf, font=scriptsize]{caption}
+\usepackage[italian]{varioref}
+\usepackage[suftesi]{frontespizio}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{comment}
+\usepackage{lipsum}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[margin=2cm]{geometry}
+%\usepackage{pgfplots}
+\usepackage{comment}
+\usepackage{lipsum}
+\usepackage{longtable}
+%\pgfplotsset{compat=1.16}
+
+%%% Il documento vero e proprio %%%
+\begin{document}
+
+%%% Frontespizio %%%
+\begin{frontespizio}
+\Universita{Padova} 
+\Logo{Fig/logo_unipd} 
+\Dipartimento{Matematica}
+\Corso[Laurea Magistrale]{Informatica} 
+
+\Annoaccademico{2020-2021}
+\Titoletto{Algoritmi Avanzati \\ Relazione di laboratorio 2}
+\Titolo{Traveling Salesman Problem}
+\Sottotitolo{Maggio 2021}
+\NCandidati{Gruppo di lavoro} 
+\Candidato[2029254]{Sofia Bononi}
+\Candidato[2022146]{Davide Franzoso}
+\Candidato[2029214]{Matteo Mariani}
+\end{frontespizio}
+
+%%% Indice %%%
+\tableofcontents
+
+\newpage
+%%% Sezioni %%%
+\input{Section/introduction.tex}
+\newpage
+\input{Section/classi.tex}
+\newpage
+\input{Section/algoritmiEsatti.tex}	
+\newpage
+\input{Section/euristicheCostruttive.tex}
+\newpage
+\input{Section/algoritmoApprossimato.tex}
+%\newpage
+%\input{Section/correttezza.tex}
+%\newpage
+%\input{Section/performance.tex}
+%\newpage
+%\input{Section/conclusioni.tex}
+
+\end{document}
