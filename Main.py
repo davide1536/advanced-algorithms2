@@ -1,7 +1,7 @@
 from Grafo import Grafo
 from Nodo import Nodo
 from Arco import Arco
-from Utility import convert, calcEuclDist, calcGeoDist, prim, preOrderVisit, getTree, creaSottoinsiemi
+from Utility import convert, calcEuclDist, calcGeoDist, prim, preOrderVisit, getTree, output_peso
 from NodeSet import NodeSet
 import random
 import os
@@ -14,16 +14,30 @@ from collections import defaultdict
 import collections
 import matplotlib.pyplot as plt
 import copy
-import time
 import random
+import time
+import sys
 
 
 #per_m = "algoritmi-avanzati-laboratorio2/"
 per_m = ""
 directory = per_m+"tsp_dataset/"
 lista_grafi = []
+sol_parziale = {}
+
+#liste contentenenti i pesi risultanti dagli algoritmi
+peso_held_karp = []
+peso_euristica = []
+peso_due_approssimato = []
+
+##liste contentenenti i tempi di esecuzione degli algoritmi
+#tempi fittizi per test
+tempo_held_karp = [0.1]*13
+tempo_euristica = [0.1]*13
+tempo_due_approssimato = [0.1]*13
 
 
+#funzione che controlla l'unicità di ogni nodo all'interno dei ciruito
 def checkUniq(c):
     for nodo in c:
         occorrenze = c.count(nodo)
@@ -32,13 +46,14 @@ def checkUniq(c):
     return True
 
 
+#funzione che controlla se il ciclo restituito è un ciclo hamiltoniano
 def checkHamiltoCycle(g, c):
     if (len(c) == g.n_nodi + 1) and (checkUniq(c) == True):
         return True
     else:
         return False
 
-
+#funzione che calcola i pesi, dato un circuito c e un grafo g
 def computeWeight(c, g):
     pesoCiclo = 0
     for i,nodo in enumerate(c):
@@ -233,70 +248,66 @@ def approx_tsp_tour(g):
 ############################################### HELD-KARP ###############################################
 
 #algoritmo esatto Held e Karp
-def hkVisit(g,v,S):
+def hkVisit(g,v,S, start):
+    global sol_parziale
+    PERIOD_OF_TIME = 5 #180
     new_set_node = []
 
-    #creo id
-    id_s = [v]       
-    id_s.append(S)
+    #creo un id univoco per ogni coppia v,S
+    id_vS = [v]
+    id_vS.append(S)
+    id_vS = str(id_vS)
 
+    #caso base
     if S == [v]:
-        print(v,S, g.adj_matrix[1][v])
         return g.adj_matrix[1][v]
     
-    elif str(id_s) in g.diz_pesi:
-        print(v,S, g.diz_pesi[str(id_s)])
-        return g.diz_pesi[str(id_s)] 
+    #coppia già calcolata
+    elif id_vS in g.diz_pesi:
+        return g.diz_pesi[id_vS] 
     
     else:
         #inizio creazione sottoinsieme
-        #nodeSet = NodeSet()
-        #nodeSet.v = v
-        #nodeSet.S = S
-        id_vS = [v]       #creo un id univoco per ogni coppia v,S da inserire nel dizionario id2NodeSet
-        id_vS.append(S)
-        id_vS = str(id_vS)
-        #g.id2NodeSet[str(id_vS)] = nodeSet
-        #print(id_vS)
         g.diz_pesi[id_vS] = None
         g.diz_padri[id_vS] = None
         #fine creazione sottoinsieme
+        
         mindist = math.inf
         minprec = None
         new_set_node[:] = S
         new_set_node.remove(v)
         for u in new_set_node:
-            dist = hkVisit(g, u, new_set_node)
+            dist = hkVisit(g, u, new_set_node, start)
             if dist + g.adj_matrix[u][v] < mindist:
                 mindist = dist + g.adj_matrix[u][v]
                 minprec = u
         g.diz_pesi[id_vS] = mindist
         g.diz_padri[id_vS] = minprec
         
-        print(v, S, mindist)
+        #costruisco la soluzione parziale
+        if g not in sol_parziale:
+            sol_parziale[g] = [id_vS, S, mindist]
+        else:
+            if len(sol_parziale[g][1]) < len(S):
+                sol_parziale[g] = [id_vS, S, mindist]
+        
+        if time.time() > start + PERIOD_OF_TIME : 
+            #print("timeout raggiunuto!")
+            #print("peso parziale:", sol_parziale[g][2])
+            #print("nodi circuito parziale:", sol_parziale[g][0])
+            peso_held_karp.append(sol_parziale[g][2])
+            raise HaltException()
+
+        
         return mindist
 
 
 
 #funzione per chiamare l'algorirmo Held e Karp
-def hkTsp(g):
-    #inizializzo le liste v,S
-    #creaSottoinsiemi(g)
-    
-    # aggiungo il vertice 0 (1 nel nostro caso)
-    #nodeSet = NodeSet()
-    #nodeSet.v = 1        
-    #nodeSet.S[:]= g.lista_id_nodi
-    #v = [1]
-    #v.append(g.lista_id_nodi)
-    #id_vS = str(v) 
-    #g.id2NodeSet[id_vS] = nodeSet
+def hkTsp(g): 
+    start = time.time()
+    return hkVisit(g, 1, g.lista_id_nodi, start)
 
-    #g.diz_pesi[nodeSet] = None
-    #g.diz_padri[nodeSet] = 1
-    
-    
-    return hkVisit(g, 1, g.lista_id_nodi)
 
 
 ############################################### CLOSEST_INSERTION ###############################################
@@ -463,9 +474,53 @@ def closest_insertion2(g):
 
 
 
+################################################ SOLUZIONI PARZIALI ################################################
+
+class HaltException(Exception):
+    pass
 
 
+#funzione per l'esecuzione di hkTsp entro 3 minuti
+def main_hkTsp(g):
+    
+    #for g in lista_grafi:
+    #print()
+    #print("-"*40)
+    #print("eseguo grafo con:", g.n_nodi, "nodi")
+    try:
+        peso = hkTsp(g)
+        peso_held_karp.append(peso)
+        #print("peso:", peso)
+    except HaltException as error:
+        pass
+    except RecursionError as re:
+        #print("Errore:")
+        #print("maximum recursion depth exceeded")
+        if g in sol_parziale:
+            #print("peso parziale:", sol_parziale[g][2])
+            #print("circuito parziale:", sol_parziale[g][0])
+            peso_held_karp.append(sol_parziale[g][2])
+        else: 
+            #print("non ci sono soluzioni per questo grafo")
+            peso_held_karp.append(1)
 
+    #print("-"*40)
+
+
+def main():
+    for g in lista_grafi:
+        main_hkTsp(g)
+        
+        hamiltonCycle1 = approx_tsp_tour(g)
+        peso_due_approssimato.append(computeWeight(hamiltonCycle1, g))
+        
+        hamiltonCycle2 = closest_insertion(g)
+        peso_euristica.append(computeWeight(hamiltonCycle2, g))
+
+    output_peso(lista_grafi, peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
+    
+
+        
 
 
 
@@ -475,28 +530,42 @@ parsing(directory)
 
 print("fine parsing")
 
-matrice = [[0,0,0,0,0], [0,0,    4,    1,    3], [0,   4 ,   0,    2,    1], [0,   1,    2,    0,    5], [0  , 3,    1,    5,    0]]
-grafo_prova = Grafo()
-n_nodi = 4
-lista_id_nodi = [1,2,3,4]
-
-grafo_prova.n_nodi = n_nodi
-grafo_prova.adj_matrix = matrice
-grafo_prova.lista_id_nodi = lista_id_nodi
-
-lista_grafi.append(grafo_prova)
-
 lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
-for g in lista_grafi:
-    if g.n_nodi == 14:
+main()
+
+
+
+
+
+
+
+# matrice = [[0,0,0,0,0], [0,0,    4,    1,    3], [0,   4 ,   0,    2,    1], [0,   1,    2,    0,    5], [0  , 3,    1,    5,    0]]
+# grafo_prova = Grafo()
+# n_nodi = 4
+# lista_id_nodi = [1,2,3,4]
+
+# grafo_prova.n_nodi = n_nodi
+# grafo_prova.adj_matrix = matrice
+# grafo_prova.lista_id_nodi = lista_id_nodi
+
+# lista_grafi.append(grafo_prova)
+
+
+#for g in lista_grafi:
+    #if g.n_nodi == 16:
 #         for i in g.lista_id_nodi:
 #           print(i, g.getNodo(i).x, g.getNodo(i).y)
-        for j in g.adj_matrix:
-            print(j)
+        #for j in g.adj_matrix:
+        #    print(j)
         #print("***********************************")
-        peso = hkTsp(g)
-        print( "peso:", peso)
+        #peso = hkTsp(g)
+        #p = g.diz_pesi['[1, [1, 2, 3, 4]]']
+        #print("peso:", peso)
+        #print("sol_parziale", sol_parziale[g][0], sol_parziale[g][2])
+        #print(len(g.diz_pesi.keys()))
+        #for vs in g.diz_pesi.keys():
+        #    print(vs)
 
         #print("***********************************")
 #         for nodo in g.id2NodeSet.keys():
@@ -512,20 +581,20 @@ for g in lista_grafi:
 #         for i in g.id2NodeSet.keys():
 #            print(i, g.id2NodeSet[i])
 
-sol_ottime = { 8 : 14,
-               14 : 3323, 
-               16 : 6859, 
-               22 : 7013,
-               51 : 426,
-               52 : 7542,
-               100 : 21294,
-               #100 : 21282,
-               150 : 6528,
-               202 : 40160,
-               229 : 134602,
-               442 : 50778,
-               493 : 35002,
-               1000 : 18659688 }
+# sol_ottime = { 8 : 14,
+#                14 : 3323, 
+#                16 : 6859, 
+#                22 : 7013,
+#                51 : 426,
+#                52 : 7542,
+#                100 : 21294,
+#                #100 : 21282,
+#                150 : 6528,
+#                202 : 40160,
+#                229 : 134602,
+#                442 : 50778,
+#                493 : 35002,
+#                1000 : 18659688 }
 
 
 """ for g in lista_grafi:
@@ -575,10 +644,6 @@ sol_ottime = { 8 : 14,
 # peso = computeWeight(hamiltonCycle, g)
 
 
-
-
-
-
 # print("peso atteso (closest): ", sol_ottime[g.n_nodi], "peso ottenuto: ", peso)
 # print("closest fornisce un' approssimazione di", (peso)/sol_ottime[g.n_nodi]) 
 # #print("closest fornisce un' approssimazione di", (peso2)/sol_ottime[g.n_nodi]) 
@@ -592,6 +657,7 @@ sol_ottime = { 8 : 14,
 
 # with open('matrix.txt', 'w') as filehandle:
 #     filehandle.writelines("%s\n" % str(row)[1:-1] for row in matrix )
+
 
 
 
