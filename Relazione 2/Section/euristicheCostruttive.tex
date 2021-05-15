@@ -1,0 +1,41 @@
+\section{Euristiche costruttive}
+\label{EuristicheCostruttive}
+
+Con il termine \textit{euristiche costruttive} si identifica una ampia famiglia di euristiche che arrivano alla
+soluzione procedendo un vertice alla volta seguendo delle regole prefissate. Lo schema generale di
+queste euristiche è composto da tre passi:
+
+\begin{enumerate}
+    \item \textbf{Inizializzazione}: scelta del ciclo parziale iniziale (o del punto di partenza);
+    \item \textbf{Selezione}: scelta del prossimo vertice da inserire nella soluzione parziale;
+    \item \textbf{Inserimento}: scelta della posizione dove inserire il nuovo vertice.
+\end{enumerate}
+
+In questo progetto si è deciso di implementare l'euristica \textbf{\textit{Closest Insertion}}, la quale è caratterizzata da:
+
+\begin{itemize}
+    \item un insieme di vertici $C \subseteq V$ che rappresentano un circuito parziale;
+    \item un vertice k non appartenente a C.
+\end{itemize}
+
+Con \textit{distanza} di k da C si intende il minimo peso di un arco che collega k a C. Nell'esutistica \textbf{\textit{Closest Insertion}} si vanno a selezionare i vertici che minimizzano la distanza dal circuito parziale.
+
+\subsection{Strutture dati}
+\label{struttureDati2}
+
+Le strutture dati utilizzate per implementare questo algoritmo sono:
+
+%\begin{itemize}
+%    \item 
+%\end{itemize}
+
+Per la descrizione delle classi si rimanda alla sezione \hyperlink{section.2}{1.2 Classi}.
+\newline
+
+\subsection{Implementazione}
+\label{implementazione2}
+
+L'algoritmo è stato implementato nel seguente modo:
+%\begin{itemize}
+%    \item 
+%\end{itemize}
