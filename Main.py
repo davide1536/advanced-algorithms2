@@ -1,7 +1,7 @@
 from Grafo import Grafo
 from Nodo import Nodo
 from Arco import Arco
-from Utility import convert, calcEuclDist, calcGeoDist, prim, preOrderVisit, getTree, output_peso
+from Utility import *
 from NodeSet import NodeSet
 import random
 import os
@@ -20,11 +20,11 @@ import sys
 
 
 #per_m = "algoritmi-avanzati-laboratorio2/"
-per_m = ""
-directory = per_m+"tsp_dataset/"
-lista_grafi = []
-sol_parziale = {}
-
+# per_m = ""
+# directory = per_m+"tsp_dataset/"
+# lista_grafi = []
+# sol_parziale = {}
+times = []
 #liste contentenenti i pesi risultanti dagli algoritmi
 peso_held_karp = []
 peso_euristica = []
@@ -36,175 +36,47 @@ tempo_held_karp = [0.1]*13
 tempo_euristica = [0.1]*13
 tempo_due_approssimato = [0.1]*13
 
-
-#funzione che controlla l'unicità di ogni nodo all'interno dei ciruito
-def checkUniq(c):
-    for nodo in c:
-        occorrenze = c.count(nodo)
-        if occorrenze > 1 and nodo != 1:
-            return False
-    return True
-
-
-#funzione che controlla se il ciclo restituito è un ciclo hamiltoniano
-def checkHamiltoCycle(g, c):
-    if (len(c) == g.n_nodi + 1) and (checkUniq(c) == True):
-        return True
-    else:
-        return False
-
-#funzione che calcola i pesi, dato un circuito c e un grafo g
-def computeWeight(c, g):
-    pesoCiclo = 0
-    for i,nodo in enumerate(c):
-        if i != (len(c)-1): 
-            nextNode = c[i+1]
-            pesoCiclo += g.adj_matrix[nodo][nextNode]
-            # print("nodo ", nodo, "vicino ", c[i+1])
-            # print("peso ", g.adj_matrix[nodo][nextNode])
-
-    return pesoCiclo
-
-
-def parsing(directory):
-    for file in os.listdir(directory):
-            crea_grafi(file)
-
-
-#funzione che dato un path, aggiunge un oggetto grafo 
-#alla lista lista_grafiw
-def crea_grafi(path):
-
-    global lista_grafi
-    g = Grafo()
-    
-    lista_nodi = []
-    id2Node = {}
-    edge_weigt_format = None
-    display_data_type = None
-
-    f = open(directory + path, "r")
-
-    #leggo la prima riga
-    riga = f.readline().split(" ")
-    
-    fine = False
-    while not fine :
-        
-        if riga[0] == "NAME:":
-            name = riga[1]
-            riga = f.readline().split(" ")      #cambio riga
-
-        elif riga[0] == "NAME":                 #un paio di grafi hanno lo spazio prima di ":"
-            name = riga[2]
-            riga = f.readline().split(" ")      
-        
-        elif riga[0] == "TYPE:":
-            g_type = riga[1] 
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "TYPE":                 
-            g_type = riga[2] 
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "COMMENT:":
-            comment = riga[1]
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "COMMENT":
-            comment = riga[2]
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "DIMENSION:":
-            n_nodi = int(riga[1])
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "DIMENSION":
-            n_nodi = int(riga[2])
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "EDGE_WEIGHT_TYPE:":    
-            edge_weigt_type = riga[1]
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "EDGE_WEIGHT_TYPE":
-            edge_weigt_type = riga[2]
-            riga = f.readline().split(" ")
-        
-        elif riga[0] == "EDGE_WEIGHT_FORMAT:":
-            edge_weigt_format = riga[1]
-            riga = f.readline().split(" ")
-
-        elif riga[0] == "DISPLAY_DATA_TYPE:":
-            display_data_type = riga[1]
-            riga = f.readline().split(" ")
-        
+def measureRunTime(algorithm):
+    times = []
+    for g in lista_grafi:
+        if g.n_nodi < 100:
+            iterations = 30
         else:
-            fine = True
+            iterations = 1
+        if algorithm == "held karp":
+            gc.disable()
+            start_time = perf_counter_ns()
+            for i in range(iterations):
+                main_hkTsp(g)
+            end_time = perf_counter_ns()
 
-    
-    #inizio parse nodi
-    #creo lista di stringhe "id_nodo, coord_x, coord_y"
-    righe = f.read().splitlines()
-    
-    #divido le stringhe in liste di 3 valori [nodo1, nodo2, peso]
-    lista_valori = []
-    for riga in righe:
-        value = riga.split()
-        if len(value) != 1 and len(value) != 0:
-            lista_valori.append(value)
-        else:
-            f.close()
-    f.close()
+        elif algorithm == "closest insertion":
+            gc.disable()
+            start_time = perf_counter_ns()
+            for i in range(iterations):
+                closest_insertion(g)
+            end_time = perf_counter_ns()
 
-    #creo i nodi, faccio le conversioni e li aggiungo alla lista nodi
-    for riga in lista_valori:
-        nodo = Nodo()
-        nodo.id = int(riga[0])
+        elif algorithm == "approx tsp tour":
+            gc.disable()
+            start_time = perf_counter_ns()
+            for i in range(iterations):
+                approx_tsp_tour(g)
+            end_time = perf_counter_ns()
         
-        if "GEO" in edge_weigt_type :
-            #conversione 
-            nodo.x = convert(float(riga[1]))
-            nodo.y = convert(float(riga[2])) 
-            
-        else:
-            nodo.x = float(riga[1])
-            nodo.y = float(riga[2])
-        
-        lista_nodi.append(nodo)
-        id2Node[nodo.id] = nodo
+        avg_time = round((end_time - start_time)/iterations//1000, 3)
 
-    #inizializzo matrice di adiacenza
-    adj_matrix = [[0]*(n_nodi+1) for i in range(n_nodi+1)]  
-    
-    #definisco anticipatamente id2Node per poterlo utilizzare subito
-    g.id2Node = id2Node
+        times.append(avg_time)
 
-    #calcolo le distanze
-    for i in range(1, n_nodi+1):
-        for j in range(1, n_nodi+1):
-            if i != j:
-                if "GEO" in edge_weigt_type:
-                    adj_matrix[i][j] = calcGeoDist(g.getNodo(i), g.getNodo(j))
-                else:
-                    adj_matrix[i][j] = calcEuclDist(g.getNodo(i), g.getNodo(j))
-    
-
-    g.n_nodi = n_nodi
-    g.name = name
-    g.g_type = g_type
-    g.comment = comment
-    g.edge_weigt_type = edge_weigt_type
-    g.edge_weigt_format = edge_weigt_format
-    g.display_data_type = display_data_type
-    g.lista_nodi = lista_nodi
-    g.lista_id_nodi = [n for n in range(1, n_nodi+1)]       #maybe inutile
-    g.adj_matrix = adj_matrix
-    
-
-    lista_grafi.append(g)
-    #print("aggiunto grafo con", g.n_nodi, "nodi")
-
+    return times
+def measurePerformance():
+    algorithmsToTest = ["held karp", "closest insertion", "approx tsp tour"]
+    totalTimes = []
+    times = []
+    for algorithm in algorithmsToTest:
+        times = measureRunTime(algorithm)
+        totalTimes.append(times)
+    return totalTimes
 
 
 
@@ -213,7 +85,7 @@ def crea_grafi(path):
 
 
 #algoritmo 2-approssimato
-def approx_tsp_tour(g):
+def  approx_tsp_tour(g):
     h = []
     #radice = random.choice(g.lista_nodi)
     radice = g.getNodo(1)
@@ -389,86 +261,7 @@ def closest_insertion(g):
     return circuitoParziale
     
 
-############################################### CLOSEST_INSERTION 2 ###############################################
 
-#fuznione per trovare il vicino più vicino
-def closest_neighbour2(g, circuito, no_circuito):
-    min_peso = math.inf
-    closest = None
-    for nodo in circuito:
-        for vicino in range(len(no_circuito)):
-            peso = g.adj_matrix[nodo.id][no_circuito[vicino].id]
-            if peso < min_peso:
-                min_peso = peso
-                closest = copy.deepcopy(no_circuito[vicino])
-                index = vicino
-    
-    return closest, index
-
-
-#versione rivista di closest_neighbour, da controllare meglio
-def closest_neighbour(g, circuito, no_circuito):
-    min_peso = [None, math.inf, 0]
-    k = None    
-    
-    for vicino in range(len(no_circuito)):
-        min_k = math.inf        #dato un k, non ancora inserito nel circuito, il suo peso è il minimo tra i pesi calcolati con ogni nodo del circuito
-        for nodo in circuito:
-            peso = g.adj_matrix[nodo.id][no_circuito[vicino].id]
-            if peso < min_k:
-                min_k = peso
-                k = no_circuito[vicino]
-                index = vicino
-
-        if min_k < min_peso[1]:
-            min_peso[1] = min_k
-            min_peso[0] = k
-            min_peso[2] = index
-    
-    return min_peso[0], min_peso[2]
-
-
-
-def insert_closest(g, closest, circuito_parziale):
-    min_dist = math.inf
-    for i in range(len(circuito_parziale)):
-        if i < len(circuito_parziale)-1:
-            dist = ( g.adj_matrix[ circuito_parziale[i].id ][closest.id] + 
-                     g.adj_matrix[closest.id][ circuito_parziale[i+1].id ] - 
-                     g.adj_matrix[ circuito_parziale[i].id ][ circuito_parziale[i+1].id ] )
-            if dist < min_dist:
-                min_dist = dist
-        else:
-            dist2 = ( g.adj_matrix[ circuito_parziale[i].id ][closest.id] + 
-                      g.adj_matrix[closest.id][ circuito_parziale[0].id ] - 
-                      g.adj_matrix[ circuito_parziale[i].id ][ circuito_parziale[0].id ] )
-            if dist2 < min_dist:
-                circuito_parziale.append(closest)
-                return
-        
-    circuito_parziale.insert(i+1, closest)
-
-
-def remove_closest(index, no_circuito):
-    no_circuito[index] = no_circuito[-1]
-    no_circuito.pop()
-
-
-def closest_insertion2(g):
-    no_circuito = []                    #lista contentente i nodi non ancora inseriti nel circuito
-    no_circuito[:] = g.lista_nodi[1:]   #lista nodi, escluso il primo
-    
-    circuito_parziale = [g.getNodo(1)]             #circuito parziale inizializzato con il primo nodo
-    
-    while len(no_circuito) != 0:
-        closest, index = closest_neighbour(g, circuito_parziale, no_circuito)
-
-        insert_closest(g, closest, circuito_parziale)
-        remove_closest(index, no_circuito)
-    
-    circuito_parziale.append(g.getNodo(1))
-
-    return circuito_parziale
     
 
 
@@ -517,7 +310,7 @@ def main():
         hamiltonCycle2 = closest_insertion(g)
         peso_euristica.append(computeWeight(hamiltonCycle2, g))
 
-    output_peso(lista_grafi, peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
+    output_peso(lista_grafi, peso_held_karp, peso_euristica, peso_due_approssimato, times[0], times[1], times[2])
     
 
         
@@ -532,7 +325,11 @@ print("fine parsing")
 
 lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
+times = measurePerformance()
+
 main()
+
+
 
 
 

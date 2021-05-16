@@ -4,11 +4,186 @@ from NodeSet import NodeSet
 import math
 from heap import heap, HeapDecreaseKey, HeapExtractMin, BuildMinHeap, isIn
 from tabulate import tabulate
-
-#h = []
-
+from Grafo import Grafo
+from Nodo import Nodo
+from Arco import Arco
+from Utility import *
+from NodeSet import NodeSet
+import random
+import os
+per_m = ""
+directory = per_m+"tsp_dataset/"
+lista_grafi = []
+sol_parziale = {}
 
 #funzione per convertire le coordinate in radianti
+#funzione che controlla l'unicità di ogni nodo all'interno dei ciruito
+def checkUniq(c):
+    for nodo in c:
+        occorrenze = c.count(nodo)
+        if occorrenze > 1 and nodo != 1:
+            return False
+    return True
+
+
+#funzione che controlla se il ciclo restituito è un ciclo hamiltoniano
+def checkHamiltoCycle(g, c):
+    if (len(c) == g.n_nodi + 1) and (checkUniq(c) == True):
+        return True
+    else:
+        return False
+
+#funzione che calcola i pesi, dato un circuito c e un grafo g
+def computeWeight(c, g):
+    pesoCiclo = 0
+    for i,nodo in enumerate(c):
+        if i != (len(c)-1): 
+            nextNode = c[i+1]
+            pesoCiclo += g.adj_matrix[nodo][nextNode]
+            # print("nodo ", nodo, "vicino ", c[i+1])
+            # print("peso ", g.adj_matrix[nodo][nextNode])
+
+    return pesoCiclo
+
+
+def parsing(directory):
+    for file in os.listdir(directory):
+            crea_grafi(file)
+
+
+#funzione che dato un path, aggiunge un oggetto grafo 
+#alla lista lista_grafiw
+def crea_grafi(path):
+
+    global lista_grafi
+    g = Grafo()
+    
+    lista_nodi = []
+    id2Node = {}
+    edge_weigt_format = None
+    display_data_type = None
+
+    f = open(directory + path, "r")
+
+    #leggo la prima riga
+    riga = f.readline().split(" ")
+    
+    fine = False
+    while not fine :
+        
+        if riga[0] == "NAME:":
+            name = riga[1]
+            riga = f.readline().split(" ")      #cambio riga
+
+        elif riga[0] == "NAME":                 #un paio di grafi hanno lo spazio prima di ":"
+            name = riga[2]
+            riga = f.readline().split(" ")      
+        
+        elif riga[0] == "TYPE:":
+            g_type = riga[1] 
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "TYPE":                 
+            g_type = riga[2] 
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "COMMENT:":
+            comment = riga[1]
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "COMMENT":
+            comment = riga[2]
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "DIMENSION:":
+            n_nodi = int(riga[1])
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "DIMENSION":
+            n_nodi = int(riga[2])
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "EDGE_WEIGHT_TYPE:":    
+            edge_weigt_type = riga[1]
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "EDGE_WEIGHT_TYPE":
+            edge_weigt_type = riga[2]
+            riga = f.readline().split(" ")
+        
+        elif riga[0] == "EDGE_WEIGHT_FORMAT:":
+            edge_weigt_format = riga[1]
+            riga = f.readline().split(" ")
+
+        elif riga[0] == "DISPLAY_DATA_TYPE:":
+            display_data_type = riga[1]
+            riga = f.readline().split(" ")
+        
+        else:
+            fine = True
+
+    
+    #inizio parse nodi
+    #creo lista di stringhe "id_nodo, coord_x, coord_y"
+    righe = f.read().splitlines()
+    
+    #divido le stringhe in liste di 3 valori [nodo1, nodo2, peso]
+    lista_valori = []
+    for riga in righe:
+        value = riga.split()
+        if len(value) != 1 and len(value) != 0:
+            lista_valori.append(value)
+        else:
+            f.close()
+    f.close()
+
+    #creo i nodi, faccio le conversioni e li aggiungo alla lista nodi
+    for riga in lista_valori:
+        nodo = Nodo()
+        nodo.id = int(riga[0])
+        
+        if "GEO" in edge_weigt_type :
+            #conversione 
+            nodo.x = convert(float(riga[1]))
+            nodo.y = convert(float(riga[2])) 
+            
+        else:
+            nodo.x = float(riga[1])
+            nodo.y = float(riga[2])
+        
+        lista_nodi.append(nodo)
+        id2Node[nodo.id] = nodo
+
+    #inizializzo matrice di adiacenza
+    adj_matrix = [[0]*(n_nodi+1) for i in range(n_nodi+1)]  
+    
+    #definisco anticipatamente id2Node per poterlo utilizzare subito
+    g.id2Node = id2Node
+
+    #calcolo le distanze
+    for i in range(1, n_nodi+1):
+        for j in range(1, n_nodi+1):
+            if i != j:
+                if "GEO" in edge_weigt_type:
+                    adj_matrix[i][j] = calcGeoDist(g.getNodo(i), g.getNodo(j))
+                else:
+                    adj_matrix[i][j] = calcEuclDist(g.getNodo(i), g.getNodo(j))
+    
+
+    g.n_nodi = n_nodi
+    g.name = name
+    g.g_type = g_type
+    g.comment = comment
+    g.edge_weigt_type = edge_weigt_type
+    g.edge_weigt_format = edge_weigt_format
+    g.display_data_type = display_data_type
+    g.lista_nodi = lista_nodi
+    g.lista_id_nodi = [n for n in range(1, n_nodi+1)]       #maybe inutile
+    g.adj_matrix = adj_matrix
+    
+
+    lista_grafi.append(g)
+    #print("aggiunto grafo con", g.n_nodi, "nodi")
 def convert(x):
     PI = 3.141592
     #deg = round(x)
@@ -80,6 +255,8 @@ def prim(g, radice):
     lista_nodi_obj = g.getListaNodi()
     index = 0
     for nodo in lista_nodi_obj:
+        nodo.padre = None
+        nodo.figlio = []
         nodo.in_h = 1
         nodo.key = float('inf')  #float('inf') indica un valore superiore a qualsiasi altro valore
         nodo.heapIndex = index  #per non usare la funzione 'index' 
