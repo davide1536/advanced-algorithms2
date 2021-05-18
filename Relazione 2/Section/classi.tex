@@ -1,7 +1,147 @@
 \section{Classi}
 \label{Classi}
 
-Per implementare gli algoritmi sono state create le seguenti classi:
+Per implementare gli algoritmi sono state create le seguenti classi di oggetti, una classe Utility e un Main:
+
+\subsection{Arco}
+\label{arco}
+
+L'oggetto \textit{Arco} contiene le infomazioni relative ad un arco:
+
+\begin{itemize}
+    \item \textbf{nodo1}: nodo iniziale;
+    \item \textbf{nodo2}: nodo finale;
+    \item \textbf{peso}: peso dell'arco;
+    \item \hypertarget{getarco}{\textbf{\textsc{getArco()}}}: funzione che restituisce una lista [nodo1, nodo2, peso];
+    \item \hypertarget{getarcoinverso}{\textbf{\textsc{getArcoInverso()}}}: funzione che, chiamata su un arco \emph{(u,v)} , ne restituisce l'inverso \emph{(v,u)}.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Grafo}
+\label{grafo}
+
+L'oggetto \textit{Grafo} contiene le informazioni relative ad un grafo:
+
+\begin{itemize}
+    \item \textbf{n\_nodi}: campo dati che indica il numero dei nodi;
+    \item \textbf{name}:;
+    \item \textbf{g\_type}:;
+    \item \textbf{comment}:;
+    \item \textbf{edge\_weigt\_type}:;
+    \item \textbf{edge\_weigt\_format}:;
+    \item \textbf{display\_data\_type}:;
+    \item \textbf{lista\_nodi}: campo dati che contiene un insieme set() di nodi; 
+    \item \textbf{lista\_id\_nodi}:;
+    \item \textbf{adj\_matrix}:;
+    \item \textbf{id2Node}: dizionario avente come campo key l'identificatore di un nodo (intero) e come valore l'oggetto nodo corrispondente a quell'identificativo;
+    \item \textbf{totPeso}: campo dati che indica il peso totale degli archi del grafo, calcolato da uno degli algoritmi presentati;
+    \item \textbf{diz\_pesi}:;
+    \item \textbf{diz\_padri}:;
+    \item \textbf{id2NodeSet}:;
+    \item \hypertarget{getnodo}{\textbf{\textsc{getNodo(id\_nodo)}}}: metodo che dato in input l'id di un nodo restituisce l'oggetto del nodo corrispondente;
+    \item \hypertarget{getnodeset}{\textbf{\textsc{getNodeSet(v,S)}}}:;
+    \item \hypertarget{getlistanodi}{\textbf{\textsc{getListaNodi()}}}: metodo che restituisce la lista di  oggetti nodi.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Nodo}
+\label{nodo}
+
+L'oggetto \textit{Nodo} contiene le informazioni relative ad un nodo:
+
+\begin{itemize}
+    \item \textbf{id}: Intero identificativo del nodo;
+    \item \textbf{x}:;
+    \item \textbf{y}:;
+    \item \hypertarget{inh}{\textbf{in\_h}}: Intero per verificare se un nodo è stato estratto dallo heap o meno;
+    \item \textbf{key}: Campo utilizzato per costruire il min-heap, inizializzato con il peso dell'arco adiacente al nodo. Ad esempio il campo key del nodo \emph{u} sarà inizializzato con il valore \emph{w(u,v)};
+    \item \textbf{heapIndex}:;
+    \item \textbf{padre}: Intero che identifica il padre v di un nodo u nell'albero di copertura minimo;
+    \item \textbf{figlio}:;
+    \item \hypertarget{hash}{\textbf{\textsc{\_\_hash\_\_()}}}: metodo che restituisce la lista di  oggetti nodi.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{NodeSet}
+\label{nodeset}
+
+L'oggetto \textit{NodeSet} contiene le seguenti informazioni:
+
+\begin{itemize}
+    \item \textbf{v}:;
+    \item \textbf{S}:.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Utility}
+\label{utility}
+
+La classe \textit{Utility} contiene le funzioni di servizio per implementare i tre algoritmi:
+
+\begin{itemize}
+    \item \hypertarget{cehckUniq}{\textbf{\textsc{checkUniq(c)}}}: metodo che controllo l'unicità di ogni nodo all'interno del circuito;
+    \item \hypertarget{checkHamiltoCycle}{\textbf{\textsc{checkHamiltoCycle(g, c)}}}: metodo che controlla se il ciclo restituito dalla funzione è hamiltoniano;
+    \item hypertarget{computeWeight}{\textbf{\textsc{computeWeight(c, g)}}}: metodo che, dato in input un circuito c e un grafo g, calcola i pesi;
+    \item hypertarget{parsing}{\textbf{\textsc{parsing(directory)}}}: metodo che, data in input una directory, analizza tutti i file interni e seleziona solo quelli con estensione .txt, fornendoli in input alla funzione \hyperlink{creagrafi}{crea\_grafi()};
+    \item hypertarget{crea\_grafi}{\textbf{\textsc{crea\_grafi(path)}}}: metodo che, dato in input un file, lo legge ed estrae le informazioni per la creazione di oggetti Grafo, Nodo e Arco;
+    \item hypertarget{convert}{\textbf{\textsc{convert(x)}}}:;
+    \item hypertarget{calcGeoDist}{\textbf{\textsc{calcGeoDist(nodo1, nodo2)}}}:;
+    \item hypertarget{calcEuclDist}{\textbf{\textsc{calcEuclDist(nodo1, nodo2)}}}:;
+    \item hypertarget{creaSottoinsiemi}{\textbf{\textsc{creaSottoinsiemi(grafo)}}}: metodo utilizzato per inizializzare le coppie v,S;
+    \item hypertarget{sub\_seq}{\textbf{\textsc{sub\_seq(grafo, n, i, g, x, s)}}}: metodo che crea le sequenze;
+    \item hypertarget{prim}{\textbf{\textsc{prim(g, radice)}}}:;
+    \item hypertarget{getTree}{\textbf{\textsc{getTree(g)}}}:;
+    \item hypertarget{preOrderVisit}{\textbf{\textsc{preOrderVisit(nodo, h)}}}:;
+    \item hypertarget{min\_reloaded}{\textbf{\textsc{min\_reloaded(list, i)}}}: metodo utilizzato per identificare l'algoritmo che restituisce il peso minore;
+    \item hypertarget{output\_peso}{\textbf{\textsc{output\_peso(ista\_grafi, peso\_held\_karp, peso\_euristica, peso\_due\_approssimato, tempo\_held\_karp, tempo\_euristica, tempo\_due\_approssimato)}}}: metodo utilizzato per creare la tabella dei risultati.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Heap}
+\label{heap}
+
+L'oggetto \textit{Heap} contiene le funzioni che permettono di realizzare un \textit{min-heap}. Uno heap è una struttura dati che si può considerare un albero binario quasi completo, ovvero un albero nel quale tutti i livelli sono riempiti quasi completamente tranne l'ultimo. Le caratteristiche dello heap sono:
+
+\begin{itemize}
+    \item l'ultimo livello incompleto si riempie da sinistra;
+    \item l'albero viene rappresentato sotto forma di array A che è caratterizzato da \textit{A.length} che rappresenta la lunghezza di A e \textit{A.heapsize} che rappresenta la dimensione dello heap.
+\end{itemize}
+
+
+Per implementare l'algoritmo è stato realizzato un \textit{min-heap}, uno heap caratterizzato da nodi con la chiave minore o uguale a quella dei figli. Quindi la radice rappresenta l'elemento più piccolo del \textit{min-heap}.
+
+
+\begin{itemize}
+    \item \textbf{vector}: vettore associato allo heap;
+    \item \textbf{length}: lunghezza del vettore;
+    \item \textbf{heapsize}: lunghezza dello heap;
+    \item \hypertarget{buildminheap}{\textbf{\textsc{BuildMinHeap(h)}}}: metodo che dato in input l'oggetto heap, costruisce un \textit{min-heap};
+    \item \hypertarget{minheapify}{\textbf{\textsc{MinHeapify(h, i)}}}: metodo che dato in input un vettore e un nodo, sistema il nodo nella posizione corretta;
+    \item \hypertarget{heapdecreasekey}{\textbf{\textsc{HeapDecreaseKey(h, i ,key)}}}: metodo che dato in input uno heap, un indice ed una nuova chiave, sostituisce il valore del vettore associato all'indice i con il nuovo valore key;
+    \item \hypertarget{heapminimum}{\textbf{\textsc{HeapMinimum(h)}}}: metodo che dato in input uno heap, restituisce il valore minimo dello heap, ossia la radice;
+    \item \hypertarget{heapextractmin}{\textbf{\textsc{HeapExtractMin(h)}}}: metodo che dato in input uno heap, trova l'elemento più piccolo, lo rimuove e ritorna l'oggetto;
+    \item \hypertarget{isin}{\textbf{\textsc{isIn(h, v)}}}: metodo che, dato in input un nodo, restituisce 1 se esso è presente nello heap, 0 altrimenti. Per rendere questa operazione di tempo costante è stata aggiunto un attributo \hyperlink{inh}{\textit{in\_h}} ad ogni nodo;
+    \item \hypertarget{right}{\textbf{\textsc{right(index)}}}: metodo che, dato in input un indice di un nodo, restituisce l'indice del nodo figlio destro;
+    \item \hypertarget{left}{\textbf{\textsc{left(index)}}}: metodo che, dato in input un indice di un nodo, restituisce l'indice del nodo figlio sinistro;
+    \item \hypertarget{parent}{\textbf{\textsc{parent(index)}}}:metodo che, dato in input un indice di un nodo, restituisce l'indice del padre.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Main}
+\label{main}
+
+La classe \textit{Main} contiene le funzioni misurazione di performance e le implementazioni degli algoritmi:
+
+\begin{itemize}
+    \item \hypertarget{measureRunTime}{\textbf{\textsc{measureRunTime(algorithm)}}}:metodo che calcola i tempi di esecuzione di ciasun algoritmo. Per aumentare l'affidabilità delle misurazioni per le istanze con un numero di nodi <=100, gli algoritmi sono stati ripetuti più volte (30) ed infine il tempo è stato calcolato dividendo il tempo totale per il numero di iterazioni;
+    \item \hypertarget{measurePerformance}{\textbf{\textsc{measurePerformance()}}}:.
+\end{itemize}
 
 
 \newpage
