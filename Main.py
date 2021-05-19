@@ -19,7 +19,7 @@ import time
 import sys
 
 
-#per_m = "algoritmi-avanzati-laboratorio2/"
+per_m = "algoritmi-avanzati-laboratorio2/"
 # per_m = ""
 # directory = per_m+"tsp_dataset/"
 # lista_grafi = []
@@ -122,7 +122,7 @@ def  approx_tsp_tour(g):
 #algoritmo esatto Held e Karp
 def hkVisit(g,v,S, start):
     global sol_parziale
-    PERIOD_OF_TIME = 5 #180
+    PERIOD_OF_TIME = 180
     new_set_node = []
 
     #creo un id univoco per ogni coppia v,S
@@ -302,6 +302,7 @@ def main_hkTsp(g):
 
 def main():
     for g in lista_grafi:
+        print("eseguo grafo con:", g.n_nodi, "nodi")
         main_hkTsp(g)
         
         hamiltonCycle1 = approx_tsp_tour(g)
@@ -309,6 +310,7 @@ def main():
         
         hamiltonCycle2 = closest_insertion(g)
         peso_euristica.append(computeWeight(hamiltonCycle2, g))
+        
 
     output_peso(lista_grafi, peso_held_karp, peso_euristica, peso_due_approssimato, times[0], times[1], times[2])
     
@@ -325,7 +327,7 @@ print("fine parsing")
 
 lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
-times = measurePerformance()
+#times = measurePerformance()
 
 main()
 
