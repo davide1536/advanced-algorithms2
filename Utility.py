@@ -1,6 +1,5 @@
 from Nodo import Nodo
 from Grafo import Grafo
-from NodeSet import NodeSet
 import math
 from heap import heap, HeapDecreaseKey, HeapExtractMin, BuildMinHeap, isIn
 from tabulate import tabulate
@@ -8,9 +7,9 @@ from Grafo import Grafo
 from Nodo import Nodo
 from Arco import Arco
 from Utility import *
-from NodeSet import NodeSet
-import random
 import os
+
+
 per_m = ""
 directory = per_m+"tsp_dataset/"
 lista_grafi = []
@@ -178,12 +177,14 @@ def crea_grafi(path):
     g.edge_weigt_format = edge_weigt_format
     g.display_data_type = display_data_type
     g.lista_nodi = lista_nodi
-    g.lista_id_nodi = [n for n in range(1, n_nodi+1)]       #maybe inutile
+    g.lista_id_nodi = [n for n in range(1, n_nodi+1)]     
     g.adj_matrix = adj_matrix
     
 
     lista_grafi.append(g)
     #print("aggiunto grafo con", g.n_nodi, "nodi")
+
+
 def convert(x):
     PI = 3.141592
     #deg = round(x)
@@ -208,43 +209,6 @@ def calcGeoDist(nodo1, nodo2):
 def calcEuclDist(nodo1, nodo2):
     dist = round(math.sqrt((nodo1.x - nodo2.x)**2 + (nodo1.y - nodo2.y)**2))
     return dist
-
-
-
-#funzione per inizializzare le coppie v,S
-def creaSottoinsiemi(grafo):
-    x = [i for i in range(2,grafo.n_nodi+1)]
-    s = [0]*(grafo.n_nodi)
-    sub_seq(grafo, grafo.n_nodi-1, 0, [], x, s)
-
-
-
-#crea sequenze
-def sub_seq(grafo, n,i,g,x, s):
-    if(i==n):
-        diz_k = []
-        for el in range(0,n):
-            if(s[el]!=0):
-                g.sort()
-                g.append(x[el])
-                diz_k.append(x[el])
-        for key in diz_k:
-            nodeSet = NodeSet()
-            nodeSet.v = key
-            nodeSet.S = g
-            v = [key]       #creo un id univoco per ogni coppia v,S da inserire nel dizionario id2NodeSet
-            v.append(g)
-            grafo.id2NodeSet[str(v)] = nodeSet
-            if len(g) == 1:
-                grafo.diz_pesi[nodeSet] = grafo.adj_matrix[i][1]
-                grafo.diz_padri[nodeSet] = 1
-            else:
-                grafo.diz_pesi[nodeSet] = None
-                grafo.diz_padri[nodeSet] = None
-        return
-    for num in [0,1]:
-      s[i]=num
-      sub_seq(grafo, n, i+1, [], x, s)
 
 
 
@@ -290,52 +254,133 @@ def preOrderVisit(nodo, h):
     for figlio in nodo.figlio:
         preOrderVisit(figlio, h)
     return h
-         
+    
+
+def minMaxScaling(pesiHk, pesiClosest, pesiApprox, tempiHk, tempiClosest, tempiApprox):
+    #normalizzazione pesi
+    pesi = pesiHk + pesiClosest + pesiApprox
+    #print("i pesi sono", pesi)
+    minPeso = min(pesi)
+    maxPeso = max(pesi)
+    
+    pesoHkNorm = []
+    pesoClosestNorm = []
+    pesoApproxNorm = []
+
+    tempoHkNorm = []
+    tempoClosestNorm = []
+    tempoApproxNorm = []
+    
+    for pesoHk in pesiHk:
+        pesoHkNorm.append((pesoHk - minPeso) / (maxPeso - minPeso))
+
+    for pesoClosest in pesiClosest:
+        pesoClosestNorm.append((pesoClosest - minPeso) / (maxPeso - minPeso))
+
+    for pesoApprox in pesiApprox:
+        pesoApproxNorm.append((pesoApprox - minPeso) / (maxPeso - minPeso))
+        
+    #normalizzazione tempi
+
+    tempi = tempiHk + tempiClosest + tempiApprox
+    minTempo = min(tempi)
+    maxTempo = max(tempi)
+    
+    for tempoHk in tempiHk:
+        tempoHkNorm.append((tempoHk - minTempo) / (maxTempo - minTempo))
+
+    for tempoClosest in tempiClosest:
+        tempoClosestNorm.append((tempoClosest - minTempo) / (maxTempo - minTempo))
+
+    for tempoApprox in tempiApprox:
+        tempoApproxNorm.append((tempoApprox - minTempo) / (maxTempo - minTempo))
+    
+    return pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm
+
+
+
+    
+    
 
 #funzione min per confronti a 3 
-# list = [peso_held_karp, peso_euristica, peso_due_approssimato]
+#list = [peso_held_karp, peso_euristica, peso_due_approssimato]
 def min_reloaded(list, i):
+    pesoHk = list[0]
+    tempoHk = list[1]
+    pesoClosest = list[2]
+    tempoClosest = list[3]
+    pesoApprox = list[4]
+    tempoApprox = list[5]
+    scoreHk = pesoHk * tempoHk
+    scoreClosest = pesoClosest * tempoClosest
+    scoreApprox = pesoApprox * tempoApprox
     algo = ""
     min_peso = 0
     if i < 2:
-        if list[0] < list[1]:
-            min_peso = list[0]
+        if scoreHk < scoreClosest:
+            min_score = scoreHk
             algo = "peso_held_karp"
-        elif list[0] > list[1]:
-            min_peso = list[1]
+        elif scoreHk > scoreClosest:
+            min_score = scoreClosest
             algo = "peso_euristica"
         else:
-            min_peso = list[0]
-            algo = "prim == kruskal"
+            min_score = scoreHk
+            algo = "peso_held_karp"
 
-        if min_peso > list[2]:
-            min_peso = list[2]
+        if min_peso > scoreApprox:
+            min_score = scoreApprox
             algo = "peso_due_approssimato"
     else:
-        min_peso = min(list[1], list[2])
-        if min_peso == list[1]:
+        min_score = min(scoreClosest, scoreApprox)
+        if min_score == scoreClosest:
             algo = "peso_euristica"
         else:
             algo = "peso_due_approssimato"
     
-    res = algo + " : " + str(min_peso)
+    res = algo 
     return res
 
 
 
+#funzione per il calcolo dell'errore per la soluzione parziale dell'algoritmo held e karp
+def calcolo_errore_avanzato(g, i, sol_esatta, sol_parziale, peso_held_karp):
+    #trovo il numero di nodi calcolati entro i 3 minuti
+    if g in sol_parziale:
+        n_nodi_circuito = len(sol_parziale[g][1])
+    else: 
+        return -1
+    
+    #errore = (soluzione_trovata - soluzione_ottima) / soluzione_ottima
+    #errore_parziale = (soluzione_parziale - soluzione_parziale_ottima) / soluzione_parziale_ottima
+    #soluzione_parziale_ottima = x
+    # n_nodi_totali : n_nodi_circuito = soluzione_ottima : x
+    # x = 
+    soluzione_parziale_ottima = (n_nodi_circuito * sol_esatta[i]) / g.n_nodi
+    errore_parziale = round((peso_held_karp[i] - soluzione_parziale_ottima) / soluzione_parziale_ottima, 3)
+    
+    return errore_parziale
+    
+
+
+
+
+
 #funzione per la creazione di tabelle dei risultati
-def output_peso(lista_grafi, peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato):
+def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato):
 
     errore_held_karp = []
     errore_euristica = []
     errore_due_approssimato = []
-
+    #print("PESI:", peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
     sol_ottime = [3323, 6859, 7013, 426, 7542, 21294, 21282, 6528, 40160, 134602, 50778, 35002, 18659688]
     
+    pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm = minMaxScaling(peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
+    #print("normalizzazione: ", pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm)
     #calcolo l'errore
     for i in range(len(lista_grafi)):
         #(soluzione_trovata - soluzione_ottima)/soluzione_ottima
-        errore_held_karp.append(round((peso_held_karp[i] - sol_ottime[i])/sol_ottime[i],3))
+        #errore_held_karp.append(round((peso_held_karp[i] - sol_ottime[i])/sol_ottime[i],3))
+        errore_held_karp.append(calcolo_errore_avanzato(lista_grafi[i], i, sol_ottime, sol_parziale, peso_held_karp))
         errore_euristica.append(round((peso_euristica[i] - sol_ottime[i])/sol_ottime[i],3))
         errore_due_approssimato.append(round((peso_due_approssimato[i] - sol_ottime[i])/sol_ottime[i],3))
 
@@ -358,7 +403,7 @@ def output_peso(lista_grafi, peso_held_karp, peso_euristica, peso_due_approssima
     #tabella con i valori inseriti
     tabella = []
     for i in range(len(lista_grafi)):
-        tabella.append([table[0][i], table[1][i], table[2][i], table[3][i], table[4][i], table[5][i], table[6][i], table[7][i], table[8][i], table[9][i], min_reloaded([table[1][i], table[4][i], table[7][i]], i)])
+        tabella.append([table[0][i], table[1][i], table[2][i], table[3][i], table[4][i], table[5][i], table[6][i], table[7][i], table[8][i], table[9][i], min_reloaded([pesoHkNorm[i],tempoHkNorm[i], pesoClosestNorm[i],tempoClosestNorm[i], pesoApproxNorm[i],tempoApproxNorm[i]], i)])
 
     print()
     print(tabulate(tabella, headers= ["istanza", "peso_held_karp", "tempo_held_karp", "errore_held_karp", "peso_euristica", "tempo_euristica", "errore_euristica", "peso_due_approssimato", "tempo_due_approssimato", "errore_due_approssimato", "algoritmo migliore"], tablefmt='pretty'))
