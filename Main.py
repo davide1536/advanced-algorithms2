@@ -5,7 +5,7 @@ from time import perf_counter_ns
 import copy
 import time
 
-#per_m = "algoritmi-avanzati-laboratorio2/"
+per_m = "algoritmi-avanzati-laboratorio2/"
 # per_m = ""
 # directory = per_m+"tsp_dataset/"
 #lista_grafi = []
@@ -22,7 +22,7 @@ peso_due_approssimato = []
 def measureRunTime(algorithm):
     times = []
     for g in lista_grafi:
-        
+        print("calcolo grafo da", g.n_nodi, "nodi")
         if algorithm == "held karp":
             gc.disable()
             start_time = perf_counter_ns()
@@ -99,7 +99,7 @@ def  approx_tsp_tour(g):
 #prende in input il grado, una coppia (vertice v, sottoinsieme S) e il tempo di inizio dell'esecuzione
 def hkVisit(g,v,S, start):
     global sol_parziale
-    PERIOD_OF_TIME = 3
+    PERIOD_OF_TIME = 180
     new_set_node = []
 
     #creo un id univoco per ogni coppia v,S
