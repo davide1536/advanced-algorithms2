@@ -5,7 +5,6 @@ from heap import heap, HeapDecreaseKey, HeapExtractMin, BuildMinHeap, isIn
 from tabulate import tabulate
 from Grafo import Grafo
 from Nodo import Nodo
-from Arco import Arco
 from Utility import *
 import os
 

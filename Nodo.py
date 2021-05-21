@@ -9,7 +9,6 @@ class Nodo:
         self.padre = None
         self.figlio = []
 
-    def __hash__(self):
-        return hash(self.id)
+
 
     
