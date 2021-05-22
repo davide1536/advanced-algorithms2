@@ -17,21 +17,18 @@ Le strutture dati e i metodi utilizzati per implementare questo algoritmo sono:
     \item \hyperlink{getNodo}{getNodo(id\_nodo)};
     \item metodo \hyperlink{prim}{prim(g, radice)};
     \item metodo \hyperlink{getTree}{getTree(g)};
-    \item metodo \hyperlink{preOrderVisit}{preOrderVisit{nodo, h}}.
+    \item metodo \hyperlink{preOrderVisit}{preOrderVisit(nodo, h)}.
 \end{itemize}
 
 
 \subsection{Implementazione}
 \label{implementazione3}
 
-L'algoritmo è implementato nel seguente modo:
+Questo algoritmo oltre ad essere un algoritmo che fornisce una buona approssimazione della soluzione ottima del problema del commesso viaggiatore e ad avere una buona complessità asintotica consente anche di essere implementato molto semplicemente.
+Per poterlo implementare sono stati quindi seguiti i seguenti passi:
 
 \begin{itemize}
-    \item viene inizializzata una lista \texttt{h} vuota;
-    \item viene assegnata alla variabile \texttt{radice} il primo vertice del grafo \texttt{g} passato in input;
-    \item successivamente viene invocato il metodo \hyperlink{prim}{prim(g, radice)} che permette di calcolare il minumum spanning tree del grafo \texttt{g};
-    \item utilizzando il metodo \hyperlink{getTree}{getTree(g)} viene identificato l'albero di copertura minimo;
-    \item per mezzo del metodo \hyperlink{preOrderVisit}{preOrderVisit(nodo, h)} viene effettuata la visita anticipata di quell'albero e assegnata ad \texttt{h} una lista di nodi ordinati in base alla visita effettuata, alla quale successivamente viene aggiunto il nodo \texttt{radice};
-    \item successivamente viene inizializzato l' \texttt{hamiltonCycle} ad \texttt{h};
-    \item dopo aver effettuato una conversione nel ciclo hamiltoniano da oggetti ad interi, questo viene restituito.
+    \item grazie alle funzioni \hyperlink{prim}{prim(g, radice)} \hyperlink{getTree}{getTree(g)} è stato calcolato l'albero di copertura minimo del grafo;
+    \item successivamente è stata fatta la sua visita anticipata con la funzione \hyperlink{preOrderVisit}{preOrderVisit(nodo, h)};
+    \item sia \texttt{h} la lista di nodi ottenuta come output da \hyperlink{preOrderVisit}{preOrderVisit(nodo, h)} per ottenere la soluzione è bastato comporre h con la radice dell'albero (primo elemento di h).
 \end{itemize}

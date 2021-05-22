@@ -20,17 +20,25 @@ In questo progetto si è deciso di implementare l'euristica \textbf{\textit{Clos
 
 Con \textit{distanza} di k da C si intende il minimo peso di un arco che collega k a C. Nell'esutistica \textbf{\textit{Closest Insertion}} si vanno a selezionare i vertici che minimizzano la distanza dal circuito parziale.
 
-\subsection{Strutture dati}
+Come l'algoritmo di approssimazione basato sull'albero di copertura minimo, \textbf{\textit{Closest Insertion}} consente di approssimare la soluzione con un circuito hammiltoniano avente costo al più il doppio di quello ottimo.
+
+\subsection{Metodi utilizzati}
 \label{struttureDati2}
 
-Le strutture dati utilizzate per implementare questo algoritmo sono:
+I metodi utilizzate per implementare questo algoritmo sono:
 
 \begin{itemize}
-    \item classe \hyperlink{subsection.2.1}{Grafo};
-    \item classe \hyperlink{subsection.2.2}{Nodo};
-    \item metodo \hyperlink{updateCiclo}{updateCiclo(nodo, ciclo, verticiCiclo, noCiclo, position)};
-    \item metodo \hyperlink{getClosestNode}{getClosestNode(g, ciclo, noCiclo))};
-    \item metodo \hyperlink{getPosition}{getPosition(g, k, ciclo, noCiclo))}.
+    \item \hyperlink{updateCiclo}{updateCiclo(nodo, ciclo, verticiCiclo, noCiclo, position)} che aggiorna il circuito parziale con un nuovo nodo. Questo metodo inoltre aggiorna 3 liste che vengono utilizzate per tenere traccia della struttura del circuito parziale, dei nodi presenti nel circuito e di quelli non presenti;
+    \item \hyperlink{getClosestNode}{getClosestNode(g, ciclo, noCiclo))} utilizzato per ottenere il nodo più vicino al circuito parziale costruito fino a quel momento.
+    Più formalmente se vuole ottenere un nodo $k$ tale che: 
+    \begin{equation}
+          \displaystyle  \min_{k}\delta(k, C)
+    \end{equation}
+    Dove la funzione $\delta($k$, $C$)$ è definita come:
+    \begin{equation}
+      \displaystyle \delta(k, C) = \min_{h \in C} w(h,k) 
+    \end{equation};
+    \item \hyperlink{getPosition}{getPosition(g, k, ciclo, noCiclo))} utilizzato per ottenere la posizione ottima all'interno del circuito per poter inserire il nuovo nodo $k$. Tale posizione viene data in modo tale che la distanza:  $w(i,k)+w(k,j)-w(i,j)$ sia minima, dove i nodi $i$ e $j$ sono nodi appartenenti al circuito.
 \end{itemize}
 
 
