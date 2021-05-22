@@ -99,7 +99,7 @@ def  approx_tsp_tour(g):
 #prende in input il grado, una coppia (vertice v, sottoinsieme S) e il tempo di inizio dell'esecuzione
 def hkVisit(g,v,S, start):
     global sol_parziale
-    PERIOD_OF_TIME = 180
+    PERIOD_OF_TIME = 1
     new_set_node = []
 
     #creo un id univoco per ogni coppia v,S

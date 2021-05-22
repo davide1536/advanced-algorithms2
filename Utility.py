@@ -6,6 +6,7 @@ from tabulate import tabulate
 from Grafo import Grafo
 from Nodo import Nodo
 from Utility import *
+import matplotlib.pyplot as plt
 import os
 
 
@@ -16,6 +17,19 @@ sol_parziale = {}
 
 #funzione per convertire le coordinate in radianti
 #funzione che controlla l'unicità di ogni nodo all'interno dei ciruito
+def plotGraph(closestPesi, approxPesi):
+    costante = []
+    for i in range(len(closestPesi)):
+        costante.append(2)
+    plt.plot(range(len(closestPesi)), costante, label="costante 2")
+    plt.plot(range(len(closestPesi)), closestPesi, label = 'Pesi closest insertion')
+    plt.plot(range(len(closestPesi)), approxPesi, label = 'Pesi approx tsp tour')
+    plt.legend()
+    plt.ylabel("peso")
+    plt.xlabel("grafo")
+    plt.show()
+
+
 def checkUniq(c):
     for nodo in c:
         occorrenze = c.count(nodo)
@@ -371,6 +385,8 @@ def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_
     errore_euristica = []
     errore_due_approssimato = []
     errore_held_karp_avanzato = []
+    rapporto_euristica = []
+    rapporto_due_approssimato = []
     #print("PESI:", peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
     sol_ottime = [3323, 6859, 7013, 426, 7542, 21294, 21282, 6528, 40160, 134602, 50778, 35002, 18659688]
     
@@ -383,6 +399,9 @@ def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_
         errore_held_karp_avanzato.append(calcolo_errore_avanzato(lista_grafi[i], i, sol_ottime, sol_parziale, peso_held_karp))
         errore_euristica.append(round((peso_euristica[i] - sol_ottime[i])/sol_ottime[i],3))
         errore_due_approssimato.append(round((peso_due_approssimato[i] - sol_ottime[i])/sol_ottime[i],3))
+
+        rapporto_euristica.append(round((peso_euristica[i] - sol_ottime[i])/sol_ottime[i],3))
+        rapporto_due_approssimato.append(round((peso_due_approssimato[i] - sol_ottime[i])/sol_ottime[i],3))
 
     #creo tabella da cui prendere i dati
     table = []
@@ -408,6 +427,7 @@ def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_
 
     print()
     print(tabulate(tabella, headers= ["istanza", "peso held karp", "tempo held karp", "errore held karp", "errore hk avanzato", "peso euristica", "tempo euristica", "errore euristica", "peso due approssimato", "tempo due approssimato", "errore due approssimato", "algoritmo migliore"], tablefmt='pretty'))
+    plotGraph(rapporto_euristica, rapporto_due_approssimato)
 
 
 
