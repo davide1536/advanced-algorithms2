@@ -25,17 +25,42 @@ Con \textit{distanza} di k da C si intende il minimo peso di un arco che collega
 
 Le strutture dati utilizzate per implementare questo algoritmo sono:
 
-%\begin{itemize}
-%    \item 
-%\end{itemize}
+\begin{itemize}
+    \item classe \hyperlink{subsection.2.1}{Grafo};
+    \item classe \hyperlink{subsection.2.2}{Nodo};
+    \item metodo \hyperlink{updateCiclo}{updateCiclo(nodo, ciclo, verticiCiclo, noCiclo, position)};
+    \item metodo \hyperlink{getClosestNode}{getClosestNode(g, ciclo, noCiclo))};
+    \item metodo \hyperlink{getPosition}{getPosition(g, k, ciclo, noCiclo))}.
+\end{itemize}
 
-Per la descrizione delle classi si rimanda alla sezione \hyperlink{section.2}{1.2 Classi}.
-\newline
 
 \subsection{Implementazione}
 \label{implementazione2}
 
 L'algoritmo è stato implementato nel seguente modo:
-%\begin{itemize}
-%    \item 
-%\end{itemize}
+
+\begin{enumerate}
+
+    \item inizializzazione: 
+
+    \begin{itemize}
+        \item sono state inizializzate tre liste: una contenente una copia dei nodi presenti nel grafo passato in input e altre due inizializzate vuote, rispettivamente \texttt{verticiCiclo} e \texttt{circuitoParziale};
+        \item viene identificato con la variabile \texttt{radice} il primo nodo da inserire all'interno del circuto parziale e utilizzando il metodo \hyperlink{updateCiclo}{updateCiclo(nodo, ciclo, verticiCiclo, noCiclo, position)} viene costruito il circuito parziale;
+        \item successivamente viene trovato, utilizzando il metodo \hyperlink{getClosestNode}{getClosestNode(g, ciclo, noCiclo))}, un vertice \texttt{nodo\_k}, che minimizza la distanza con il nodo presente nel circuito parziale e, utilizzando il metodo \hyperlink{updateCiclo}{updateCiclo(nodo, ciclo, verticiCiclo, noCiclo, position)}, viene aggiornato il circuito parziale.
+    \end{itemize}
+
+    \item selezione:
+
+    \begin{itemize}
+        \item utilizzando l'iterazione sui vertici non ancora presenti nel circuito, viene cercato, utilizzando il metodo \hyperlink{getClosestNode}{getClosestNode(g, ciclo, noCiclo))}, un vertice \texttt{nodo\_k}, che minimizza la distanza tra esso e il circuito parziale.
+    \end{itemize}
+
+    \item inserimento:
+
+    \begin{itemize}
+        \item utilizzando il metodo \hyperlink{getPosition}{getPosition(g, k, ciclo, noCiclo))} viene cercato l'arco del circuito parziale che minimizza la distanza con il nodo trovato durante il passo di selezione, il \texttt{nodo\_k}, ed infine viene inserito il vertice \texttt{nodo\_k} tra i due nodi dell'arco appena trovati;
+    \end{itemize}
+
+    si giunge così ad ottenere un circuito.
+    
+\end{enumerate}

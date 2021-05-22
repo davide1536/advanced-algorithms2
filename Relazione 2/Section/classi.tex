@@ -1,46 +1,28 @@
 \section{Classi}
 \label{Classi}
 
-Per implementare gli algoritmi sono state create le seguenti classi di oggetti, una classe Utility e un Main:
-
-\subsection{Arco}
-\label{arco}
-
-L'oggetto \textit{Arco} contiene le infomazioni relative ad un arco:
-
-\begin{itemize}
-    \item \textbf{nodo1}: nodo iniziale;
-    \item \textbf{nodo2}: nodo finale;
-    \item \textbf{peso}: peso dell'arco;
-    \item \hypertarget{getarco}{\textbf{\textsc{getArco()}}}: funzione che restituisce una lista [nodo1, nodo2, peso];
-    \item \hypertarget{getarcoinverso}{\textbf{\textsc{getArcoInverso()}}}: funzione che, chiamata su un arco \emph{(u,v)} , ne restituisce l'inverso \emph{(v,u)}.
-\end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Per implementare gli algoritmi sono state create le classi di oggetti Grafo, Nodo e Heap, una classe Utility e un Main:
 
 \subsection{Grafo}
 \label{grafo}
 
-L'oggetto \textit{Grafo} contiene le informazioni relative ad un grafo:
+L'oggetto \textit{Grafo} contiene le informazioni relative ad un'istanza di grafo:
 
 \begin{itemize}
     \item \textbf{n\_nodi}: campo dati che indica il numero dei nodi;
-    \item \textbf{name}:;
+    \item \textbf{name}: nome del file corrispondente al grafo;
     \item \textbf{g\_type}:;
-    \item \textbf{comment}:;
-    \item \textbf{edge\_weigt\_type}:;
-    \item \textbf{edge\_weigt\_format}:;
-    \item \textbf{display\_data\_type}:;
-    \item \textbf{lista\_nodi}: campo dati che contiene un insieme set() di nodi; 
-    \item \textbf{lista\_id\_nodi}:;
-    \item \textbf{adj\_matrix}:;
+    \item \textbf{comment}: commento presente nel file corrispondente al grafo;
+    \item \textbf{edge\_weigt\_type}: tipologia delle coordinate;
+    \item \textbf{edge\_weigt\_format}: formato dei pesi degli archi;
+    \item \textbf{display\_data\_type}: tipologia di rappresentazione dei dati;
+    \item \textbf{lista\_nodi}: campo dati contenente la lista degli oggetti Nodo; 
+    \item \textbf{lista\_id\_nodi}: lista contenente gli id dei nodi;
+    \item \textbf{adj\_matrix}: matrice di adiacenza nxn i cui valori rappresentano la distanza tra i nodi;
     \item \textbf{id2Node}: dizionario avente come campo key l'identificatore di un nodo (intero) e come valore l'oggetto nodo corrispondente a quell'identificativo;
-    \item \textbf{totPeso}: campo dati che indica il peso totale degli archi del grafo, calcolato da uno degli algoritmi presentati;
-    \item \textbf{diz\_pesi}:;
-    \item \textbf{diz\_padri}:;
-    \item \textbf{id2NodeSet}:;
+    \item \textbf{diz\_pesi}: dizionario dei pesi, utile per la costruzione della tabella di Held e Karp;
+    \item \textbf{diz\_padri}: dizionario dei padri, utile per la ricostruzione del circuito per held e karp;
     \item \hypertarget{getnodo}{\textbf{\textsc{getNodo(id\_nodo)}}}: metodo che dato in input l'id di un nodo restituisce l'oggetto del nodo corrispondente;
-    \item \hypertarget{getnodeset}{\textbf{\textsc{getNodeSet(v,S)}}}:;
     \item \hypertarget{getlistanodi}{\textbf{\textsc{getListaNodi()}}}: metodo che restituisce la lista di  oggetti nodi.
 \end{itemize}
 
@@ -52,27 +34,14 @@ L'oggetto \textit{Grafo} contiene le informazioni relative ad un grafo:
 L'oggetto \textit{Nodo} contiene le informazioni relative ad un nodo:
 
 \begin{itemize}
-    \item \textbf{id}: Intero identificativo del nodo;
-    \item \textbf{x}:;
-    \item \textbf{y}:;
-    \item \hypertarget{inh}{\textbf{in\_h}}: Intero per verificare se un nodo è stato estratto dallo heap o meno;
-    \item \textbf{key}: Campo utilizzato per costruire il min-heap, inizializzato con il peso dell'arco adiacente al nodo. Ad esempio il campo key del nodo \emph{u} sarà inizializzato con il valore \emph{w(u,v)};
-    \item \textbf{heapIndex}:;
-    \item \textbf{padre}: Intero che identifica il padre v di un nodo u nell'albero di copertura minimo;
-    \item \textbf{figlio}:;
-    \item \hypertarget{hash}{\textbf{\textsc{\_\_hash\_\_()}}}: metodo che restituisce la lista di  oggetti nodi.
-\end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{NodeSet}
-\label{nodeset}
-
-L'oggetto \textit{NodeSet} contiene le seguenti informazioni:
-
-\begin{itemize}
-    \item \textbf{v}:;
-    \item \textbf{S}:.
+    \item \textbf{id}: intero identificativo del nodo;
+    \item \textbf{x}: coordinata x del nodo;
+    \item \textbf{y}: coordinata y del nodo;
+    \item \hypertarget{inh}{\textbf{in\_h}}: intero per verificare se un nodo è stato estratto dallo heap o meno;
+    \item \textbf{key}: campo utilizzato per costruire il min-heap, inizializzato con il peso dell'arco adiacente al nodo. Ad esempio il campo key del nodo \emph{u} sarà inizializzato con il valore \emph{w(u,v)};
+    \item \textbf{heapIndex}: indice utilizzato per tenere traccia della posizione di ogni nodo all'interno dell'heap;
+    \item \textbf{padre}: intero che identifica il padre v di un nodo u nell'albero di copertura minimo;
+    \item \textbf{figlio}: intero che identifica il figlio u di un nodo v nell'albero di copertura minimo;
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,16 +56,16 @@ La classe \textit{Utility} contiene le funzioni di servizio per implementare i t
     \item \hypertarget{checkHamiltoCycle}{\textbf{\textsc{checkHamiltoCycle(g, c)}}}: metodo che controlla se il ciclo restituito dalla funzione è hamiltoniano;
     \item hypertarget{computeWeight}{\textbf{\textsc{computeWeight(c, g)}}}: metodo che, dato in input un circuito c e un grafo g, calcola i pesi;
     \item hypertarget{parsing}{\textbf{\textsc{parsing(directory)}}}: metodo che, data in input una directory, analizza tutti i file interni e seleziona solo quelli con estensione .txt, fornendoli in input alla funzione \hyperlink{creagrafi}{crea\_grafi()};
-    \item hypertarget{crea\_grafi}{\textbf{\textsc{crea\_grafi(path)}}}: metodo che, dato in input un file, lo legge ed estrae le informazioni per la creazione di oggetti Grafo, Nodo e Arco;
-    \item hypertarget{convert}{\textbf{\textsc{convert(x)}}}:;
-    \item hypertarget{calcGeoDist}{\textbf{\textsc{calcGeoDist(nodo1, nodo2)}}}:;
-    \item hypertarget{calcEuclDist}{\textbf{\textsc{calcEuclDist(nodo1, nodo2)}}}:;
-    \item hypertarget{creaSottoinsiemi}{\textbf{\textsc{creaSottoinsiemi(grafo)}}}: metodo utilizzato per inizializzare le coppie v,S;
-    \item hypertarget{sub\_seq}{\textbf{\textsc{sub\_seq(grafo, n, i, g, x, s)}}}: metodo che crea le sequenze;
-    \item hypertarget{prim}{\textbf{\textsc{prim(g, radice)}}}:;
-    \item hypertarget{getTree}{\textbf{\textsc{getTree(g)}}}:;
-    \item hypertarget{preOrderVisit}{\textbf{\textsc{preOrderVisit(nodo, h)}}}:;
-    \item hypertarget{min\_reloaded}{\textbf{\textsc{min\_reloaded(list, i)}}}: metodo utilizzato per identificare l'algoritmo che restituisce il peso minore;
+    \item hypertarget{crea\_grafi}{\textbf{\textsc{crea\_grafi(path)}}}: metodo che, dato in input un file, lo legge ed estrae le informazioni per la creazione di oggetti Grafo e Nodo;
+    \item hypertarget{convert}{\textbf{\textsc{convert(x)}}}: metodo utile per la conversione delle coordinate dei grafi Geo;
+    \item hypertarget{calcGeoDist}{\textbf{\textsc{calcGeoDist(nodo1, nodo2)}}}: metodo che calcola le distanza tra nodi per grafi di tipo "Geo";
+    \item hypertarget{calcEuclDist}{\textbf{\textsc{calcEuclDist(nodo1, nodo2)}}}: metodo che calcola le distanza tra nodi per grafi di tipo "Eucl";
+    \item hypertarget{prim}{\textbf{\textsc{prim(g, radice)}}}: metodo che calcola, dato un grafo, l'MST corrispondente;
+    \item hypertarget{getTree}{\textbf{\textsc{getTree(g)}}}: metodo che dato un grafo elaborato con Prim restituisce l'albero di copertura minimo;
+    \item hypertarget{preOrderVisit}{\textbf{\textsc{preOrderVisit(nodo, h)}}}: metodo che, dato un albero t, effettua la visita anticipata di quell'albero, l'output è quindi una lista di nodi ordinati in base alla visita fatta;
+    \item hypertarget{minMaxScaling}{\textbf{\textsc{minMaxScaling(pesiHk, pesiClosest, pesiApprox, tempiHk, tempiClosest, tempiApprox)}}}:;
+    \item hypertarget{min\_reloaded}{\textbf{\textsc{min\_reloaded(list, i)}}}: metodo utilizzato per identificare l'algoritmo con prestazioni migliori (fare un approfondimento sull'originalità del metodo);
+    \item hypertarget{calcolo\_errore\_avanzato}{\textbf{\textsc{calcolo\_errore\_avanzato(g, i, sol\_esatta, sol\_parziale)}}}: metodo utilizzato per il calcolo dell'errore per la soluzione parziale dell'algoritmo;
     \item hypertarget{output\_peso}{\textbf{\textsc{output\_peso(ista\_grafi, peso\_held\_karp, peso\_euristica, peso\_due\_approssimato, tempo\_held\_karp, tempo\_euristica, tempo\_due\_approssimato)}}}: metodo utilizzato per creare la tabella dei risultati.
 \end{itemize}
 
@@ -139,8 +108,21 @@ Per implementare l'algoritmo è stato realizzato un \textit{min-heap}, uno heap 
 La classe \textit{Main} contiene le funzioni misurazione di performance e le implementazioni degli algoritmi:
 
 \begin{itemize}
-    \item \hypertarget{measureRunTime}{\textbf{\textsc{measureRunTime(algorithm)}}}:metodo che calcola i tempi di esecuzione di ciasun algoritmo. Per aumentare l'affidabilità delle misurazioni per le istanze con un numero di nodi <=100, gli algoritmi sono stati ripetuti più volte (30) ed infine il tempo è stato calcolato dividendo il tempo totale per il numero di iterazioni;
-    \item \hypertarget{measurePerformance}{\textbf{\textsc{measurePerformance()}}}:.
+
+    \item \hypertarget{measureruntime}{\textbf{\textsc{measureRunTime(algorithm)}}}: metodo che calcola i tempi di esecuzione di ciasun algoritmo;
+    
+    \item \hypertarget{measureperformance}{\textbf{\textsc{measurePerformance()}}}:;
+    
+    \item \hypertarget{hktsp}{\textbf{\textsc{hkTsp(g)}}}: funzione che invoca il metodo \hyperlink{hkvisit}{hkVisit()} e fissa l'istante di inizio dal quale calcolare i 3 minuti di esecuzione massima per l'algoritmo di Held e Karp;
+    
+    \item \hypertarget{updateciclo}{\textbf{\textsc{updateCiclo(nodo, ciclo, verticiCiclo, noCiclo, position)}}}: funzione che aggiorna il ciclo hamiltoniano calcolato fino a quel momento;
+    
+    \item \hypertarget{getclosestnode}{\textbf{\textsc{getClosestNode(g, ciclo, noCiclo)}}}: funzione che, dato in input un ciclo e i nodi che non appertengono ad esso, calcola, tra i nodi non presenti nel ciclo, il più vicino ad esso;
+    
+    \item \hypertarget{getposition}{\textbf{\textsc{getPosition(g, k, ciclo, noCiclo)}}}: funzione che restituisce la posizione in cui aggiungere il nodo k al ciclo, per cui  il valore \[w(i, k) + w(k, j) - w(i, j)\] sia minimo;
+    
+    \item \hypertarget{mainhk}{\textbf{\textsc{main\_hkTsp(g)}}}: funzione che gestisce l'esecuzione dell'algoritmo di Held e Karp, proseguendo con il grafo successivo in caso siano passati i 3 minuti previsti.
+
 \end{itemize}
 
 

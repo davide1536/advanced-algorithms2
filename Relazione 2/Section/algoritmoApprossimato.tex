@@ -1,19 +1,24 @@
 \section{Algoritmo 2-approssimato}
 \label{AlgoritmoApprossimato}
 
-L' \textbf{\textit{algoritmo 2-approssimato}} 
+L' \textbf{\textit{algoritmo 2-approssimato}} utilizza come sottoprocedura l'algoritmo di Prim, che fornisce un MST.
+L'algoritmo 2-approssimato sfrutta la disugualianza triangolare, ossia dati tre nodi X, Y, Z, la distanza tra X e Y è al più la distanza tra X e Y sommata alla distanza tra Y e Z.  
+Questo algoritmo è considerato 2-approssimato in quanto crea un ciclo con un costo che è al massimo due volte il costo della soluzione ottima.
 
 \subsection{Strutture dati}
 \label{struttureDati3}
 
 Le strutture dati e i metodi utilizzati per implementare questo algoritmo sono:
 
-%\begin{itemize}
-%    \item 
-%\end{itemize}
-
-Per la descrizione delle classi si rimanda alla sezione \hyperlink{section.2}{1.2 Classi}.
-\newline
+\begin{itemize}
+    \item classe \hyperlink{subsection.2.1}{Grafo};
+    \item classe \hyperlink{subsection.2.2}{Nodo};
+    \item metodo \hyperlink{getNodo}{getNodo(id\_nodo)};
+    \item \hyperlink{getNodo}{getNodo(id\_nodo)};
+    \item metodo \hyperlink{prim}{prim(g, radice)};
+    \item metodo \hyperlink{getTree}{getTree(g)};
+    \item metodo \hyperlink{preOrderVisit}{preOrderVisit{nodo, h}}.
+\end{itemize}
 
 
 \subsection{Implementazione}
@@ -21,6 +26,12 @@ Per la descrizione delle classi si rimanda alla sezione \hyperlink{section.2}{1.
 
 L'algoritmo è implementato nel seguente modo:
 
-%\begin{itemize}
-%    \item 
-%\end{itemize}
+\begin{itemize}
+    \item viene inizializzata una lista \texttt{h} vuota;
+    \item viene assegnata alla variabile \texttt{radice} il primo vertice del grafo \texttt{g} passato in input;
+    \item successivamente viene invocato il metodo \hyperlink{prim}{prim(g, radice)} che permette di calcolare il minumum spanning tree del grafo \texttt{g};
+    \item utilizzando il metodo \hyperlink{getTree}{getTree(g)} viene identificato l'albero di copertura minimo;
+    \item per mezzo del metodo \hyperlink{preOrderVisit}{preOrderVisit(nodo, h)} viene effettuata la visita anticipata di quell'albero e assegnata ad \texttt{h} una lista di nodi ordinati in base alla visita effettuata, alla quale successivamente viene aggiunto il nodo \texttt{radice};
+    \item successivamente viene inizializzato l' \texttt{hamiltonCycle} ad \texttt{h};
+    \item dopo aver effettuato una conversione nel ciclo hamiltoniano da oggetti ad interi, questo viene restituito.
+\end{itemize}

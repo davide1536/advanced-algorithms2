@@ -1,24 +1,54 @@
 \section{Algoritmo esatto di Held e Karp}
 \label{algoritmoEsatto}
 
-L' \textbf{\textit{algoritmo esatto di Held e Karp}} è un algoritmo di programmazione dinamica, tecnica che permette di risolvere problemi di ottimizzazione combinando le soluzioni di sottoproblemi più semplici, per risolvere TSP nel 1962.
+L' \textbf{\textit{algoritmo esatto di Held e Karp}} è basato sull'utilizzo della programmazione dinamica, tecnica che permette di risolvere problemi di ottimizzazione combinando le soluzioni di sottoproblemi più semplici, per risalire poi alla soluzione cercata.
 
 \subsection{Strutture dati}
 \label{struttureDati1}
 
 Le strutture dati utilizzate per implementare questo algoritmo sono:
 
-%\begin{itemize}
-%    \item 
-%\end{itemize}
-
-La descrizione si piò trovare alla sezione \textsc{1.2 Classi}.
+\begin{itemize}
+    \item classe \hyperlink{subsection.2.1}{Grafo};
+    \item metodo \hyperlink{hkvisit}{hkVisit(g, v, S, start)};
+    \item metodo \hyperlink{hktsp}{hkTsp(g))}.
+\end{itemize}
 
 \subsection{Implementazione}
 \label{implementazione1}
 
 Questo algoritmo è stato implementato nel seguente modo:
 
-%\begin{itemize}
-%    \item 
-%\end{itemize}
+\begin{itemize}
+    \item viene eseguita la chiamata a \hyperlink{hktsp}{hkTsp(g))}, che a sua volta chiama \hyperlink{hkvisit}{hkVisit(g,v,S, start)} con input la coppia nodo 0 e sottoinsime la lista di tutti i nodi.
+    
+    \item inizia quindi l'esecuzione dell'algoritmo vero e proprio;
+    
+    \item come primo passo viene creato un id univoco per la coppia servita in input all'algoritmo. Per motivi implementativi l'id non è altro che una stringa costruita nel seguente modo:
+    
+    \begin{itemize}
+        \item data una coppia \texttt{(v,S)} --> l'id sarà la stringa \texttt{'[v[S]]'}
+    \end{itemize}
+    
+    in questo modo è possibile ricostruire in qualsiasi momento l'id corrispondente ad una coppia, e trovare in tempo O(1) il peso del circuito relativo, all'interno del dizionario diz\_pesi;
+    
+    \item si procede quindi con il caso base, cioè quando il sottoinsieme S è composto dal solo nodo v, in questa evenienza si restituisce semplicemente il peso da 0 a v;
+    
+    \item nel caso in cui, invece, il sottoproblema fosse già stato calcolato in precedenza (tipico della programmazione dinamica), si restituisce il peso corrispondente alla coppia (e quindi al circuito parziale);
+    
+    \item se non si rientra in uno dei casi precedenti, si procede con il calcolo effettivo del peso del circuito parziale:
+    
+    \begin{itemize}
+        \item vengono inizializzati il peso e il padre del circuito all'interno dei dizionari;
+        
+        \item per ogni nodo u, presente nel sottoinsieme, si calcolano tutti i sottoproblemi di dimensione più piccola, richiamando quindi \hyperlink{hkvisit}{hkVisit(g, u, S, start)} con input nodo u e sottoinsieme \( S\setminus \left \{ v \right \} \).
+        
+    \end{itemize}
+    
+    \item a questo punto si definisce una soluzione parziale e, se la soluzione parziale salvata al passo n-1 contiene meno nodi di quella calcolata al passo n, viene aggiornata;
+    
+    \item per finire viene eseguito il controllo del timer di 3 minuti e si decide se procedere o lanciare l'eccezione \texttt{HaltException()} ed interrompere l'esecuzione del programma.
+    
+\end{itemize}
+
+\newpage
