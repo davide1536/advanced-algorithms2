@@ -12,6 +12,8 @@ per_m = "algoritmi-avanzati-laboratorio2/"
 #sol_parziale = {}
 times = []
 
+sol_ottime = [3323, 6859, 7013, 426, 7542, 21294, 21282, 6528, 40160, 134602, 50778, 35002, 18659688]
+
 #liste contentenenti i pesi risultanti dagli algoritmi
 peso_held_karp = []
 peso_euristica = []
@@ -54,7 +56,7 @@ def measureRunTime(algorithm):
             peso_due_approssimato.append(computeWeight(hamiltonCycle1, g))
             gc.enable()
 
-        avg_time = round((end_time - start_time)//1000, 3)
+        avg_time = round((end_time - start_time)/1000000000, 5)
 
         times.append(avg_time)
 
@@ -75,7 +77,6 @@ def measurePerformance():
 ############################################### 2-APPROSSIMATO ###############################################
 
 
-
 #algoritmo 2-approssimato
 def  approx_tsp_tour(g):
     h = []
@@ -86,9 +87,6 @@ def  approx_tsp_tour(g):
     h = preOrderVisit(radice, h)
     h.append(radice)
     hamiltonCycle = h
-    #conversione ciclo hamiltoniano da oggetti a interi
-    for i,nodo in enumerate(hamiltonCycle):
-        hamiltonCycle[i] = nodo.id
 
     return hamiltonCycle
 
@@ -96,10 +94,10 @@ def  approx_tsp_tour(g):
 ############################################### HELD-KARP ###############################################
 
 #algoritmo esatto Held e Karp
-#prende in input il grado, una coppia (vertice v, sottoinsieme S) e il tempo di inizio dell'esecuzione
+#prende in input il grafo, una coppia (vertice v, sottoinsieme S) e il tempo di inizio dell'esecuzione
 def hkVisit(g,v,S, start):
     global sol_parziale
-    PERIOD_OF_TIME = 1
+    PERIOD_OF_TIME = 180
     new_set_node = []
 
     #creo un id univoco per ogni coppia v,S
@@ -116,7 +114,7 @@ def hkVisit(g,v,S, start):
         return g.diz_pesi[id_vS] 
     
     else:
-        #inizializzo diz_pesi e diz_padri con il nuovo sottoinsieme
+        #inizializzo le chiavi di diz_pesi e diz_padri con il nuovo sottoinsieme
         g.diz_pesi[id_vS] = None
         g.diz_padri[id_vS] = None
         
@@ -138,6 +136,7 @@ def hkVisit(g,v,S, start):
         else:
             if len(sol_parziale[g][1]) < len(S):
                 sol_parziale[g] = [id_vS, S, mindist]
+                print("numero nodi", len(S))
         
         #calcolo dei 3 minuti
         if time.time() > start + PERIOD_OF_TIME : 
@@ -174,14 +173,14 @@ def getClosestNode(g, ciclo, noCiclo):
                 minPeso = peso
                 nodo_k = nodo2
   
-
     return nodo_k
 
 
-def getPosition(g, k, ciclo, noCiclo):
+
+def getPosition(g, k, ciclo):
     minPeso = float('inf')
 
-    for index,nodo in enumerate(ciclo):
+    for index in range(len(ciclo)):
         if index!= (len(ciclo)-1):
             i = ciclo[index]
             j = ciclo[index+1]
@@ -192,12 +191,10 @@ def getPosition(g, k, ciclo, noCiclo):
             if peso < minPeso:
                 minPeso = peso
                 min_i = i
-                min_j = j
 
-               
-    return min_i, min_j
+    return min_i
 
-  
+
 def closest_insertion(g):
     #tengo traccia dei nodi nel circuito parziale attraverso queste 2 liste
     verticiNonCiclo = copy.deepcopy(g.lista_id_nodi) 
@@ -216,9 +213,8 @@ def closest_insertion(g):
     while len(verticiNonCiclo) != 0: #finche non ho inserito tutti i vertici
       
         nodo_k = getClosestNode(g, verticiCiclo, verticiNonCiclo)
-        node_i, node_j = getPosition(g, nodo_k, circuitoParziale, verticiNonCiclo)
+        node_i= getPosition(g, nodo_k, circuitoParziale)
         position_i = circuitoParziale.index(node_i)
-        # position_j = circuitoParziale.index(node_j)
 
         updateCiclo(nodo_k, circuitoParziale,verticiCiclo, verticiNonCiclo, position_i+1)
 
@@ -250,11 +246,6 @@ def main_hkTsp(g):
         else:
             peso_held_karp.append(0)
 
-    #print("-"*40)
-
-
-
-    
 
 
 
@@ -268,4 +259,6 @@ lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
 times = measurePerformance()
 
-output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_due_approssimato, times[0], times[1], times[2])
+
+output_peso(lista_grafi, sol_ottime, sol_parziale, peso_held_karp, peso_euristica, peso_due_approssimato, times[0], times[1], times[2])
+

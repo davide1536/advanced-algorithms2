@@ -15,18 +15,28 @@ directory = per_m+"tsp_dataset/"
 lista_grafi = []
 sol_parziale = {}
 
+
 #funzione per convertire le coordinate in radianti
 #funzione che controlla l'unicità di ogni nodo all'interno dei ciruito
-def plotGraph(closestPesi, approxPesi):
+def plotGraph(closestPesi, approxPesi, sol_ottime):
+    rapporto_closestPesi = [0]*len(closestPesi)
+    rapporto_approxPesi = [0]*len(closestPesi)
     costante = []
+    costante_1 = []
+    
     for i in range(len(closestPesi)):
         costante.append(2)
-    plt.plot(range(len(closestPesi)), costante, label="costante 2")
-    plt.plot(range(len(closestPesi)), closestPesi, label = 'Pesi closest insertion')
-    plt.plot(range(len(closestPesi)), approxPesi, label = 'Pesi approx tsp tour')
+        costante_1.append(1)
+        rapporto_closestPesi[i] = closestPesi[i]/sol_ottime[i]
+        rapporto_approxPesi[i] = approxPesi[i]/sol_ottime[i]
+    
+    plt.plot(range(len(closestPesi)), costante, label="Rapporto con sol_ottima: 2")
+    plt.plot(range(len(closestPesi)), rapporto_closestPesi, label = 'Rapporti closest insertion')
+    plt.plot(range(len(closestPesi)), rapporto_approxPesi, label = 'Rapporti approx tsp tour')
+    plt.plot(range(len(closestPesi)), costante_1, label= "Soluzione ottima")
     plt.legend()
-    plt.ylabel("peso")
-    plt.xlabel("grafo")
+    plt.ylabel("Soluzione trovata / soluzione ottima")
+    plt.xlabel("Grafi")
     plt.show()
 
 
@@ -39,7 +49,7 @@ def checkUniq(c):
 
 
 #funzione che controlla se il ciclo restituito è un ciclo hamiltoniano
-def checkHamiltoCycle(g, c):
+def checkHamiltonCycle(g, c):
     if (len(c) == g.n_nodi + 1) and (checkUniq(c) == True):
         return True
     else:
@@ -47,6 +57,12 @@ def checkHamiltoCycle(g, c):
 
 #funzione che calcola i pesi, dato un circuito c e un grafo g
 def computeWeight(c, g):
+    #controllo se c'è bisogno di fare conversione ad intero 
+    if type(c[0]) != int:
+        #conversione ciclo hamiltoniano da oggetti a interi
+        for i,nodo in enumerate(c):
+            c[i] = nodo.id
+
     pesoCiclo = 0
     for i,nodo in enumerate(c):
         if i != (len(c)-1): 
@@ -370,7 +386,8 @@ def calcolo_errore_avanzato(g, i, sol_esatta, sol_parziale, peso_held_karp):
     # x = 
     soluzione_parziale_ottima = (n_nodi_circuito * sol_esatta[i]) / g.n_nodi
     errore_parziale = round((peso_held_karp[i] - soluzione_parziale_ottima) / soluzione_parziale_ottima, 3)
-    
+
+    print("nodi calcolati", n_nodi_circuito, "nodi del grafo" ,g.n_nodi)
     return errore_parziale
     
 
@@ -379,16 +396,14 @@ def calcolo_errore_avanzato(g, i, sol_esatta, sol_parziale, peso_held_karp):
 
 
 #funzione per la creazione di tabelle dei risultati
-def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato):
+def output_peso(lista_grafi, sol_ottime, sol_parziale, peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato):
 
     errore_held_karp = []
     errore_euristica = []
     errore_due_approssimato = []
     errore_held_karp_avanzato = []
-    rapporto_euristica = []
-    rapporto_due_approssimato = []
     #print("PESI:", peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
-    sol_ottime = [3323, 6859, 7013, 426, 7542, 21294, 21282, 6528, 40160, 134602, 50778, 35002, 18659688]
+    
     
     pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm = minMaxScaling(peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
     #print("normalizzazione: ", pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm)
@@ -400,8 +415,6 @@ def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_
         errore_euristica.append(round((peso_euristica[i] - sol_ottime[i])/sol_ottime[i],3))
         errore_due_approssimato.append(round((peso_due_approssimato[i] - sol_ottime[i])/sol_ottime[i],3))
 
-        rapporto_euristica.append(round((peso_euristica[i] - sol_ottime[i])/sol_ottime[i],3))
-        rapporto_due_approssimato.append(round((peso_due_approssimato[i] - sol_ottime[i])/sol_ottime[i],3))
 
     #creo tabella da cui prendere i dati
     table = []
@@ -427,7 +440,7 @@ def output_peso(lista_grafi, sol_parziale, peso_held_karp, peso_euristica, peso_
 
     print()
     print(tabulate(tabella, headers= ["istanza", "peso held karp", "tempo held karp", "errore held karp", "errore hk avanzato", "peso euristica", "tempo euristica", "errore euristica", "peso due approssimato", "tempo due approssimato", "errore due approssimato", "algoritmo migliore"], tablefmt='pretty'))
-    plotGraph(rapporto_euristica, rapporto_due_approssimato)
+    plotGraph(peso_euristica, peso_due_approssimato, sol_ottime)
 
 
 
