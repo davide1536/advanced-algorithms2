@@ -5,11 +5,7 @@ from time import perf_counter_ns
 import copy
 import time
 
-per_m = "algoritmi-avanzati-laboratorio2/"
-# per_m = ""
-# directory = per_m+"tsp_dataset/"
-#lista_grafi = []
-#sol_parziale = {}
+
 times = []
 
 sol_ottime = [3323, 6859, 7013, 426, 7542, 21294, 21282, 6528, 40160, 134602, 50778, 35002, 18659688]
@@ -20,11 +16,9 @@ peso_euristica = []
 peso_due_approssimato = []
 
 
-
 def measureRunTime(algorithm):
     times = []
     for g in lista_grafi:
-        print("calcolo grafo da", g.n_nodi, "nodi")
         if algorithm == "held karp":
             gc.disable()
             start_time = perf_counter_ns()
@@ -136,7 +130,6 @@ def hkVisit(g,v,S, start):
         else:
             if len(sol_parziale[g][1]) < len(S):
                 sol_parziale[g] = [id_vS, S, mindist]
-                print("numero nodi", len(S))
         
         #calcolo dei 3 minuti
         if time.time() > start + PERIOD_OF_TIME : 
@@ -258,7 +251,6 @@ print("fine parsing")
 lista_grafi = sorted(lista_grafi, key=lambda grafo: grafo.n_nodi)
 
 times = measurePerformance()
-
 
 output_peso(lista_grafi, sol_ottime, sol_parziale, peso_held_karp, peso_euristica, peso_due_approssimato, times[0], times[1], times[2])
 

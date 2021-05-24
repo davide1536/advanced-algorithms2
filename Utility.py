@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import os
 
 
-per_m = ""
-directory = per_m+"tsp_dataset/"
+#per_m = ""
+directory = "tsp_dataset/"
 lista_grafi = []
 sol_parziale = {}
 
@@ -80,7 +80,7 @@ def parsing(directory):
 
 
 #funzione che dato un path, aggiunge un oggetto grafo 
-#alla lista lista_grafiw
+#alla lista lista_grafi
 def crea_grafi(path):
 
     global lista_grafi
@@ -211,7 +211,6 @@ def crea_grafi(path):
     
 
     lista_grafi.append(g)
-    #print("aggiunto grafo con", g.n_nodi, "nodi")
 
 
 def convert(x):
@@ -244,7 +243,6 @@ def calcEuclDist(nodo1, nodo2):
 
 def prim(g, radice):
     g.totPeso = 0
-    #radice.padre = radice.id
     lista_nodi_obj = g.getListaNodi()
     index = 0
     for nodo in lista_nodi_obj:
@@ -279,7 +277,6 @@ def getTree(g):
 
 def preOrderVisit(nodo, h):
     h.append(nodo)
-    #print("pre order visit ", nodo.id)
     for figlio in nodo.figlio:
         preOrderVisit(figlio, h)
     return h
@@ -288,7 +285,6 @@ def preOrderVisit(nodo, h):
 def minMaxScaling(pesiHk, pesiClosest, pesiApprox, tempiHk, tempiClosest, tempiApprox):
     #normalizzazione pesi
     pesi = pesiHk + pesiClosest + pesiApprox
-    #print("i pesi sono", pesi)
     minPeso = min(pesi)
     maxPeso = max(pesi)
     
@@ -402,11 +398,11 @@ def output_peso(lista_grafi, sol_ottime, sol_parziale, peso_held_karp, peso_euri
     errore_euristica = []
     errore_due_approssimato = []
     errore_held_karp_avanzato = []
-    #print("PESI:", peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
+
     
     
     pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm = minMaxScaling(peso_held_karp, peso_euristica, peso_due_approssimato, tempo_held_karp, tempo_euristica, tempo_due_approssimato)
-    #print("normalizzazione: ", pesoHkNorm,pesoClosestNorm,pesoApproxNorm,tempoHkNorm,tempoClosestNorm,tempoApproxNorm)
+    
     #calcolo l'errore
     for i in range(len(lista_grafi)):
         #(soluzione_trovata - soluzione_ottima)/soluzione_ottima
